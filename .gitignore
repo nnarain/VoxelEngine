@@ -1,0 +1,13 @@
+*.vcxproj
+*.filters
+*.user
+
+
+Debug/
+
+*.o
+*.obj
+*.exe
+
+# scripts
+*.lua
