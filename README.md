@@ -14,6 +14,5 @@ Dependencies
 - luabind
 	- lua 5.2
 	- Boost C++
-	
 
 	
