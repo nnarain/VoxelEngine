@@ -12,7 +12,9 @@ namespace engine
 
 		~VoxelEngine();
 
-		static VoxelEngine& getEngine();
+		void render();
+
+		static VoxelEngine* getEngine();
 
 	private:
 		VoxelEngine();

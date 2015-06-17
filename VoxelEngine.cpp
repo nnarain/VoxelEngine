@@ -9,10 +9,15 @@ VoxelEngine::VoxelEngine()
 {
 }
 
-VoxelEngine& VoxelEngine::getEngine()
+void VoxelEngine::render()
+{
+	
+}
+
+VoxelEngine* VoxelEngine::getEngine()
 {
 	static VoxelEngine engine;
-	return engine;
+	return &engine;
 }
 
 VoxelEngine::~VoxelEngine()

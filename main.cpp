@@ -49,6 +49,9 @@ int main(int argc, char *argv[])
 	glfwWindowHint(GLFW_OPENGL_PROFILE, 0);
 
 	//
+	VoxelEngine& engine = *VoxelEngine::getEngine();
+
+	//
 	char *scriptName = argv[1];
 
 	// Initialize the scripting engine

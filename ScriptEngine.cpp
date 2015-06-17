@@ -4,6 +4,7 @@
 // exported classes
 #include "Window.h"
 #include "Timer.h"
+#include "VoxelEngine.h"
 
 using namespace engine;
 using namespace engine::script;
@@ -23,6 +24,13 @@ void ScriptEngine::init()
 
 	// export window class
 	module(_state)[
+
+		class_<VoxelEngine>("Engine")
+			.scope[
+				def("getEngine", &VoxelEngine::getEngine)
+			]
+			.def("render", &VoxelEngine::render),
+
 		class_<gui::Window>("Window")
 			.def(constructor<const char*, int, int>())
 			.def("shouldClose", &gui::Window::shouldClose)
