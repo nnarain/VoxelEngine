@@ -27,7 +27,8 @@ void ScriptEngine::init()
 			.def(constructor<const char*, int, int>())
 			.def("shouldClose", &gui::Window::shouldClose)
 			.def("pollEvents",  &gui::Window::pollEvents)
-			.def("swapBuffers", &gui::Window::swapBuffers),
+			.def("swapBuffers", &gui::Window::swapBuffers)
+			.def("setMousePosition", &gui::Window::setMousePosition),
 
 		class_<Timer>("Timer")
 			.def(constructor<>())

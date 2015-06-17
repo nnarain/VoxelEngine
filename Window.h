@@ -24,6 +24,8 @@ namespace engine
 			bool shouldClose();
 			void pollEvents();
 
+			void setMousePosition(float x, float y);
+
 			void swapBuffers();
 
 			GLFWwindow *getWindow();

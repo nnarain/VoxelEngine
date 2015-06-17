@@ -1,14 +1,11 @@
 
 #include "Window.h"
 
-#include <SGL/SGL.h>
-
 using namespace engine;
 using namespace engine::gui;
 
 Window::Window(const std::string& title, int w, int h) : _width(w), _height(h), _window(NULL)
 {
-	glfwInit();
 	_window = glfwCreateWindow(w, h, title.c_str(), NULL, NULL);
 
 	if (!_window)
@@ -16,10 +13,6 @@ Window::Window(const std::string& title, int w, int h) : _width(w), _height(h), 
 		glfwTerminate();
 		exit(1);
 	}
-
-	glfwMakeContextCurrent(_window);
-
-	sgl::init();
 }
 
 bool Window::shouldClose()
@@ -30,6 +23,11 @@ bool Window::shouldClose()
 void Window::pollEvents()
 {
 	glfwPollEvents();
+}
+
+void Window::setMousePosition(float x, float y)
+{
+	glfwSetCursorPos(_window, x, y);
 }
 
 void Window::swapBuffers()
@@ -45,7 +43,6 @@ GLFWwindow* Window::getWindow()
 Window::~Window()
 {
 	glfwDestroyWindow(_window);
-	glfwTerminate();
 }
 
 

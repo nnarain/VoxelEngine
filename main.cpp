@@ -1,6 +1,10 @@
 
+#include "VoxelEngine.h"
 #include "ScriptEngine.h"
 #include "Window.h"
+
+#include <SGL/SGL.h>
+#include <SGL/Util/Exception.h>
 
 #include <iostream>
 
@@ -12,8 +16,8 @@ using namespace engine::script;
 /* Prototypes */
 
 static void scriptError(const char *what);
-static void initUserInput(ScriptEngine* scriptEngine);
 
+static void initializeContext(gui::Window* window);
 static void registerUICallbacks(gui::Window* window);
 
 /* UI callbacks */
@@ -35,22 +39,43 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 
-	// script to run
+	// init GLFW
+	if (!glfwInit())
+	{
+		std::cout << "failed to initialize GLFW" << std::endl;
+		return -1;
+	}
+
+	glfwWindowHint(GLFW_OPENGL_PROFILE, 0);
+
+	//
 	char *scriptName = argv[1];
 
-	// Scripting Engine
+	// Initialize the scripting engine
 	ScriptEngine scriptEngine;
 	scriptEngine.init();
 	scriptEngine.setErrorCallback(scriptError);
 
 	scriptEngine.addFunction("registerUICallbacks", registerUICallbacks);
+	scriptEngine.addFunction("initializeContext",   initializeContext);
 
 	g_ScriptEngine = &scriptEngine;
 
 	// run the script
 	scriptEngine.run(scriptName);
 
+	// terminate glfw
+	glfwTerminate();
+
 	return 0;
+}
+
+void initializeContext(gui::Window* window)
+{
+	GLFWwindow* gWindow = window->getWindow();
+	glfwMakeContextCurrent(gWindow);
+
+	sgl::init();
 }
 
 void registerUICallbacks(gui::Window* window)
