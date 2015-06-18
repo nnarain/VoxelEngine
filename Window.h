@@ -30,6 +30,9 @@ namespace engine
 
 			GLFWwindow *getWindow();
 
+			int getWidth();
+			int getHeight();
+
 		private:
 
 			GLFWwindow* _window;

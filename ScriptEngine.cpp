@@ -30,7 +30,10 @@ void ScriptEngine::init()
 				def("getEngine", &VoxelEngine::getEngine)
 			]
 			.def("render", &VoxelEngine::render)
-			.def("addManager", &VoxelEngine::addChunkManager),
+			.def("createWindow", &VoxelEngine::createWindow)
+			.def("getWindow", &VoxelEngine::getWindow)
+			.def("addManager", &VoxelEngine::addChunkManager)
+			.def("updateCamera", &VoxelEngine::updateCamera),
 
 		class_<Block>("Block")
 			.def_readonly("t", &Block::t)

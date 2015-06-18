@@ -3,6 +3,8 @@
 #define VOXELENGINE_H
 
 #include "ChunkManager.h"
+#include "FPSCamera.h"
+#include "Window.h"
 
 #include <set>
 
@@ -18,6 +20,14 @@ namespace engine
 
 		void addChunkManager(ChunkManager* manager);
 
+		void updateCamera(float delta);
+
+		void createWindow(const char * title, int width, int height);
+
+		FPSCamera* getCamera();
+
+		gui::Window* getWindow();
+
 		static VoxelEngine* getEngine();
 
 	private:
@@ -25,9 +35,18 @@ namespace engine
 		VoxelEngine();
 		VoxelEngine(const VoxelEngine&);
 
+		//
+		std::set<ChunkManager*> _chunkManagers;
+
+		//
+		gui::Window* _window;
+
+		//
+		FPSCamera _camera;
+
 		/* private functions */
 
-		std::set<ChunkManager*> _chunkManagers;
+		void initializeContext();
 
 	};
 }

@@ -40,6 +40,16 @@ GLFWwindow* Window::getWindow()
 	return _window;
 }
 
+int Window::getWidth()
+{
+	return _width;
+}
+
+int Window::getHeight()
+{
+	return _height;
+}
+
 Window::~Window()
 {
 	glfwDestroyWindow(_window);

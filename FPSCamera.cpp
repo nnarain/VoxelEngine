@@ -52,8 +52,6 @@ void FPSCamera::updateLookDirection(float x, float y, float delta)
 
 	_lookAngleH += SPEED * ((viewportWidth / 2) - x) * delta;
 	_lookAngleV += SPEED * ((viewportHeight / 2) - y) * delta;
-
-	//	std::cout << "(" << _lookAngleH << ", " << _lookAngleV << ")" << std::endl;
 }
 
 void FPSCamera::updatePosition(float delta)
