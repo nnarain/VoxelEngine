@@ -10,6 +10,8 @@
 
 #define VERSION "1.0"
 
+//#define ENABLE_SCRIPTING
+
 using namespace engine;
 using namespace engine::script;
 
@@ -49,9 +51,16 @@ int main(int argc, char *argv[])
 	glfwWindowHint(GLFW_OPENGL_PROFILE, 0);
 
 	//
-	VoxelEngine& engine = *VoxelEngine::getEngine();
+
+#ifndef ENABLE_SCRIPTING
+	gui::Window window("Voxel Engine", 840, 620);
+	initializeContext(&window);
+
+	ChunkManager chunkManager(32, 16, 32, 16, 1);
+#endif
 
 	//
+#ifdef ENABLE_SCRIPTING
 	char *scriptName = argv[1];
 
 	// Initialize the scripting engine
@@ -60,12 +69,13 @@ int main(int argc, char *argv[])
 	scriptEngine.setErrorCallback(scriptError);
 
 	scriptEngine.addFunction("registerUICallbacks", registerUICallbacks);
-	scriptEngine.addFunction("initializeContext",   initializeContext);
+	scriptEngine.addFunction("initializeContext", initializeContext);
 
 	g_ScriptEngine = &scriptEngine;
 
 	// run the script
 	scriptEngine.run(scriptName);
+#endif
 
 	// terminate glfw
 	glfwTerminate();

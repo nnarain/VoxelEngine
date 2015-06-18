@@ -208,9 +208,11 @@ bool Chunk::hasLocation(void) const
 	return _hasLocation;
 }
 
-void Chunk::setLocation(const sgl::Vector3& l)
+void Chunk::setLocation(int x, int y, int z)
 {
-	_offset = l;
+	_offset.x = (float)x;
+	_offset.y = (float)y;
+	_offset.z = (float)z;
 }
 
 sgl::Vector3 Chunk::getLocation(void)

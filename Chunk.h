@@ -30,7 +30,7 @@ namespace engine
 
 		bool hasLocation(void) const;
 
-		void setLocation(const sgl::Vector3& l);
+		void setLocation(int x, int y, int z);
 		sgl::Vector3 getLocation(void);
 
 	private:
