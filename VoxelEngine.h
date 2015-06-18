@@ -4,7 +4,7 @@
 
 #include "ChunkManager.h"
 
-#include <vector>
+#include <set>
 
 namespace engine
 {
@@ -16,6 +16,8 @@ namespace engine
 
 		void render();
 
+		void addChunkManager(ChunkManager* manager);
+
 		static VoxelEngine* getEngine();
 
 	private:
@@ -25,7 +27,7 @@ namespace engine
 
 		/* private functions */
 
-		std::vector<ChunkManager*> _chunkManagers;
+		std::set<ChunkManager*> _chunkManagers;
 
 	};
 }

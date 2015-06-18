@@ -36,7 +36,7 @@ void Chunk::setBlock(int x, int y, int z, int t)
 	_dirty = true;
 }
 
-Block Chunk::getBlock(int x, int y, int z)
+Block& Chunk::getBlock(int x, int y, int z)
 {
 	int idx = (x * _size) + (y * _size * _size) + z;
 

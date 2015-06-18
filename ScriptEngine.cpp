@@ -29,7 +29,20 @@ void ScriptEngine::init()
 			.scope[
 				def("getEngine", &VoxelEngine::getEngine)
 			]
-			.def("render", &VoxelEngine::render),
+			.def("render", &VoxelEngine::render)
+			.def("addManager", &VoxelEngine::addChunkManager),
+
+		class_<Block>("Block")
+			.def_readonly("t", &Block::t)
+			.def_readonly("x", &Block::x)
+			.def_readonly("y", &Block::y)
+			.def_readonly("z", &Block::z),
+
+		class_<ChunkManager>("ChunkManager")
+			.def(constructor<int, int, int>())
+			.def(constructor<int, int, int, int, float>())
+			.def("getBlock", &ChunkManager::getBlock)
+			.def("setBlock", &ChunkManager::setBlock),
 
 		class_<gui::Window>("Window")
 			.def(constructor<const char*, int, int>())
