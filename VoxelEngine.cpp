@@ -20,17 +20,14 @@ void VoxelEngine::render()
 {
 	if (_updateChunks)
 	{
-		updateChunkManagers(_camera.getFrustum());
+		updateChunkManagers(_camera);
 		_updateChunks = false;
 	}
-
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	std::set<ChunkManager*>::iterator iter;
 	for (iter = _chunkManagers.begin(); iter != _chunkManagers.end(); ++iter)
 	{
 		ChunkManager* manager = (*iter);
-		manager->render();
 	}
 }
 
@@ -39,9 +36,14 @@ void VoxelEngine::addChunkManager(ChunkManager* manager)
 	_chunkManagers.insert(manager);
 }
 
-void VoxelEngine::updateChunkManagers(sgl::Frustum& frustum)
+void VoxelEngine::updateChunkManagers(FPSCamera& camera)
 {
-
+	std::set<ChunkManager*>::iterator iter;
+	for (iter = _chunkManagers.begin(); iter != _chunkManagers.end(); ++iter)
+	{
+		ChunkManager* manager = *iter;
+		manager->update(camera);
+	}
 }
 
 void VoxelEngine::updateCamera(float delta)
@@ -94,11 +96,7 @@ void VoxelEngine::initializeContext()
 	glfwMakeContextCurrent(_window->getWindow());
 	sgl::init();
 
-	glClearColor(1, 1, 1, 1);
-	glEnable(GL_DEPTH_TEST);
-
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	_renderer.init();
 }
 
 gui::Window* VoxelEngine::getWindow()

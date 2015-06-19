@@ -5,6 +5,7 @@
 #include "ChunkManager.h"
 #include "FPSCamera.h"
 #include "Window.h"
+#include "Renderer.h"
 
 #include <set>
 
@@ -28,6 +29,9 @@ namespace engine
 
 		gui::Window* getWindow();
 
+		/**
+			Return the instance of the voxel engine
+		*/
 		static VoxelEngine* getEngine();
 
 	private:
@@ -43,11 +47,14 @@ namespace engine
 		gui::Window* _window;
 
 		//
+		Renderer _renderer;
+
+		//
 		FPSCamera _camera;
 
 		/* private functions */
 
-		void updateChunkManagers(sgl::Frustum& frustum);
+		void updateChunkManagers(FPSCamera& camera);
 
 		void initializeContext();
 

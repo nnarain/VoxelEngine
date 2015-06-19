@@ -1,6 +1,6 @@
 
 #ifndef CHUNKMANAGER_H
-#define CHUNKMANGER_H
+#define CHUNKMANAGER_H
 
 #include "Chunk.h"
 #include "FPSCamera.h"
