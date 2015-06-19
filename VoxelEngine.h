@@ -37,6 +37,7 @@ namespace engine
 
 		//
 		std::set<ChunkManager*> _chunkManagers;
+		bool _updateChunks;
 
 		//
 		gui::Window* _window;
@@ -45,6 +46,8 @@ namespace engine
 		FPSCamera _camera;
 
 		/* private functions */
+
+		void updateChunkManagers(sgl::Frustum& frustum);
 
 		void initializeContext();
 

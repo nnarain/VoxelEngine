@@ -28,6 +28,8 @@ namespace engine
 
 		bool isSetup(void) const;
 
+		bool shouldRender(void);
+
 		bool hasLocation(void) const;
 
 		void setLocation(int x, int y, int z);

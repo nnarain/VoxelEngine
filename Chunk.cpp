@@ -203,6 +203,11 @@ bool Chunk::isSetup(void) const
 	return _dirty == false;
 }
 
+bool Chunk::shouldRender(void)
+{
+	return _shouldRender;
+}
+
 bool Chunk::hasLocation(void) const
 {
 	return _hasLocation;

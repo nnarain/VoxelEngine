@@ -2,6 +2,7 @@
 #include "ChunkManager.h"
 
 using namespace engine;
+using namespace sgl;
 
 ChunkManager::ChunkManager(int x, int y, int z) : ChunkManager(x, y, z, 16, 1)
 {
@@ -18,11 +19,113 @@ ChunkManager::ChunkManager(int x, int y, int z, int chunkSize, float blockSize) 
 	allocateChunks(chunkSize, blockSize);
 }
 
-void ChunkManager::update()
+void ChunkManager::update(FPSCamera& camera)
 {
 
 
 	rebuildChunks();
+}
+
+void ChunkManager::updateVisiblityList(sgl::Frustum& frustum)
+{
+	// clear the current chunks
+	_chunkRenderSet.clear();
+
+	//
+	Vector3& nearCenter = frustum.getPoint(Frustum::PointId::NC);
+	Vector3& farCenter  = frustum.getPoint(Frustum::PointId::FC);
+
+	Vector3 center = (farCenter + nearCenter) / 2.0f;
+
+	Chunk& chunk = getChunkFromWorldPosition(center);
+
+	_chunkRenderSet.insert(&chunk);
+
+	//
+	Vector3 loc = chunk.getLocation();
+	int x = (int)loc.x;
+	int y = (int)loc.y;
+	int z = (int)loc.z;
+
+	ChunkSet adjacent;
+
+	int i, j, k;
+
+	for (i = x - 1; i <= x + 1; ++i)
+	{
+		for (j = y - 1; j <= y + 1; ++j)
+		{
+			for (k = z - 1; k <= z + 1; ++k)
+			{
+				Chunk& chunk = getChunk(i, j, k);
+
+				adjacent.insert(&chunk);
+				_chunkVisibleSet.insert(&chunk);
+
+				if (chunk.isSetup())
+				{
+					_chunkRenderSet.insert(&chunk);
+				}
+				else
+				{
+					_chunkRebuildSet.insert(&chunk);
+				}
+			}
+		}
+	}
+
+	float frustumVolume = frustum.getVolume();
+}
+
+void ChunkManager::fillFrustumVolume(float volume, ChunkSet& chunks)
+{
+	ChunkSet adjacent;
+
+	ChunkSet::iterator iter;
+	for (iter = chunks.begin(); iter != chunks.end(); ++iter)
+	{
+		Chunk& chunk = *(*iter);
+
+		Vector3 loc = chunk.getLocation();
+		int x = (int)loc.x;
+		int y = (int)loc.y;
+		int z = (int)loc.z;
+
+		// get the adjacent chunks
+
+		int i, j, k;
+
+		for (i = x - 1; i <= x + 1; ++i)
+		{
+			for (j = y - 1; j <= y + 1; ++j)
+			{
+				for (k = z - 1; k <= z + 1; ++k)
+				{
+					Chunk& chunk = getChunk(i, j, k);
+
+					adjacent.insert(&chunk);
+					_chunkVisibleSet.insert(&chunk);
+
+					if (chunk.isSetup())
+					{
+						_chunkRenderSet.insert(&chunk);
+					}
+					else
+					{
+						_chunkRebuildSet.insert(&chunk);
+					}
+				}
+			}
+		}
+	}
+
+	float renderSize = (float)(_chunkSize * _blockSize * 2);
+	float chunkVolume = _chunkVisibleSet.size() * (float)(renderSize * renderSize * renderSize);
+
+	if (chunkVolume < volume)
+	{
+		fillFrustumVolume(volume, adjacent);
+	}
 }
 
 void ChunkManager::render()
@@ -31,7 +134,11 @@ void ChunkManager::render()
 	for (iter = _chunkRenderSet.begin(); iter != _chunkRenderSet.end(); ++iter)
 	{
 		Chunk* chunk = (*iter);
-		chunk->render();
+		
+		if (chunk->shouldRender())
+		{
+			chunk->render();
+		}
 	}
 }
 
@@ -51,6 +158,26 @@ Block ChunkManager::getBlockFromWorldPosition(float x, float y, float z)
 	int blockZ = (int)z / blockRenderSize;
 
 	return getBlock(blockX, blockY, blockZ);
+}
+
+Chunk& ChunkManager::getChunkFromWorldPosition(const sgl::Vector3& pos)
+{
+	return getChunkFromWorldPosition(pos.x, pos.y, pos.z);
+}
+
+Chunk& ChunkManager::getChunkFromWorldPosition(float x, float y, float z)
+{
+	// world space size of a chunk
+	float chunkRenderSize = (float)(_chunkSize * _blockSize * 2);
+
+	// get the x,y,z indices of the chunk at given location 
+
+	int chunkX = (int)(x / chunkRenderSize);
+	int chunkY = (int)(y / chunkRenderSize);
+	int chunkZ = (int)(z / chunkRenderSize);
+
+	//
+	return getChunk(chunkX, chunkY, chunkZ);
 }
 
 Block ChunkManager::getBlock(int x, int y, int z)

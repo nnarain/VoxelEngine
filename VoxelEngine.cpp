@@ -18,6 +18,12 @@ VoxelEngine::VoxelEngine() : _camera(Vector3(10, 10, 10)), _window(nullptr)
 
 void VoxelEngine::render()
 {
+	if (_updateChunks)
+	{
+		updateChunkManagers(_camera.getFrustum());
+		_updateChunks = false;
+	}
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	std::set<ChunkManager*>::iterator iter;
@@ -33,10 +39,15 @@ void VoxelEngine::addChunkManager(ChunkManager* manager)
 	_chunkManagers.insert(manager);
 }
 
+void VoxelEngine::updateChunkManagers(sgl::Frustum& frustum)
+{
+
+}
+
 void VoxelEngine::updateCamera(float delta)
 {
-	static double lastX = -1;
-	static double lastY = -1;
+	static Vector3 cameraPosition;
+	static Vector3 cameraDirection;
 
 	GLFWwindow* gWindow = _window->getWindow();
 
@@ -45,6 +56,21 @@ void VoxelEngine::updateCamera(float delta)
 	glfwSetCursorPos(gWindow, _window->getWidth() / 2, _window->getHeight() / 2);
 
 	_camera.updateLookDirection((float)x, (float)y, delta);
+
+	//
+	Vector3& currentPosition = _camera.getPosition();
+	Vector3& currentDirection = _camera.getDirection();
+
+	// if the camera has moved
+	if (currentPosition != cameraPosition || currentDirection != cameraDirection)
+	{
+		// update to the new position, direction and render distance
+		cameraPosition = currentPosition;
+		cameraDirection = currentDirection;
+
+		//
+		_updateChunks = true;
+	}
 }
 
 void VoxelEngine::createWindow(const char * title, int width, int height)

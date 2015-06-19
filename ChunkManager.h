@@ -3,6 +3,7 @@
 #define CHUNKMANGER_H
 
 #include "Chunk.h"
+#include "FPSCamera.h"
 
 #include <vector>
 #include <set>
@@ -34,7 +35,9 @@ namespace engine
 		/**
 			Update which chunks should be rendered using a camera frustum
 		*/
-		void update();
+		void update(FPSCamera& camera);
+
+		void updateVisiblityList(sgl::Frustum& frustum);
 
 		/**
 			render visible chunks
@@ -55,6 +58,9 @@ namespace engine
 		
 		*/
 		Block getBlockFromWorldPosition(const sgl::Vector3& position);
+
+		Chunk& getChunkFromWorldPosition(const sgl::Vector3& position);
+		Chunk& getChunkFromWorldPosition(float x, float y, float z);
 		
 		/**
 		*/
@@ -83,6 +89,8 @@ namespace engine
 		Chunk& getChunk(int x, int y, int z);
 
 		void rebuildChunks();
+
+		void fillFrustumVolume(float volume, ChunkSet& adjacent);
 
 		void allocateChunks(int chunkSize, float blockSize);
 
