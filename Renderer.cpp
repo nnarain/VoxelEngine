@@ -1,9 +1,10 @@
 
 #include "Renderer.h"
-
-#include <SGL/Util/Exception.h>
+#include "DefaultShaders.h"
 
 #include "GL/glew.h"
+
+#include <SGL/Util/Exception.h>
 
 #include <iostream>
 
@@ -18,19 +19,20 @@ void Renderer::init()
 {
 	try
 	{
-		_chunkShader.load(ShaderProgram::Type::VERTEX,   "");
-		_chunkShader.load(ShaderProgram::Type::FRAGMENT, "");
+		_chunkShader.load(ShaderProgram::Type::VERTEX,   GLSL_VERTEX_NORMAL_TEXTURE_VERT);
+		_chunkShader.load(ShaderProgram::Type::FRAGMENT, GLSL_VERTEX_NORMAL_TEXTURE_FRAG);
 		_chunkShader.addAttribute("vPosition", 3);
 		_chunkShader.addAttribute("vNormal",   3);
 		_chunkShader.addAttribute("vTexCoord", 2);
 
 		_chunkShader.link();
-
 	}
 	catch (Exception& e)
 	{
 		std::cout << "Error initializing the Renderer" << std::endl;
 		std::cout << e.what() << std::endl;
+
+		exit(1);
 	}
 
 	glClearColor(1, 1, 1, 1);

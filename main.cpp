@@ -28,7 +28,6 @@ static void onMouseMove(GLFWwindow*, double x, double y);
 
 /* Globals */
 
-static GLFWwindow* g_Window;
 static ScriptEngine* g_ScriptEngine;
 
 int main(int argc, char *argv[])
@@ -76,10 +75,10 @@ int main(int argc, char *argv[])
 
 void registerUICallbacks(gui::Window* window)
 {
-	g_Window = window->getWindow();
+	GLFWwindow* gWindow = window->getWindow();
 
-	glfwSetKeyCallback(g_Window, onKeyEvent);
-	glfwSetCursorPosCallback(g_Window, onMouseMove);
+	glfwSetKeyCallback(gWindow, onKeyEvent);
+	glfwSetCursorPosCallback(gWindow, onMouseMove);
 }
 
 void onKeyEvent(GLFWwindow* window, int key, int scancode, int action, int mods)

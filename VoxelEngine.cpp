@@ -12,7 +12,7 @@
 using namespace engine;
 using namespace sgl;
 
-VoxelEngine::VoxelEngine() : _camera(Vector3(10, 10, 10)), _window(nullptr)
+VoxelEngine::VoxelEngine() : _camera(Vector3(10, 10, 10)), _window(nullptr), _renderer(nullptr)
 {
 }
 
@@ -96,7 +96,13 @@ void VoxelEngine::initializeContext()
 	glfwMakeContextCurrent(_window->getWindow());
 	sgl::init();
 
-	_renderer.init();
+	_renderer = new Renderer();
+	_renderer->init();
+}
+
+Renderer& VoxelEngine::getRenderer()
+{
+	return *_renderer;
 }
 
 gui::Window* VoxelEngine::getWindow()
@@ -117,5 +123,7 @@ VoxelEngine* VoxelEngine::getEngine()
 
 VoxelEngine::~VoxelEngine()
 {
+	if (_window != nullptr)   delete _window;
+	if (_renderer != nullptr) delete _renderer;
 }
 

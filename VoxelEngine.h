@@ -29,6 +29,8 @@ namespace engine
 
 		gui::Window* getWindow();
 
+		Renderer& getRenderer();
+
 		/**
 			Return the instance of the voxel engine
 		*/
@@ -47,7 +49,7 @@ namespace engine
 		gui::Window* _window;
 
 		//
-		Renderer _renderer;
+		Renderer* _renderer;
 
 		//
 		FPSCamera _camera;

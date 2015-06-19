@@ -9,6 +9,8 @@
 
 namespace engine
 {
+	/**
+	*/
 	class Renderer
 	{
 	public:
