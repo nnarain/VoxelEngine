@@ -1,6 +1,8 @@
 
 #include "Chunk.h"
 
+#include "VoxelEngine.h"
+
 using namespace engine;
 using namespace sgl;
 
@@ -136,31 +138,31 @@ void Chunk::createCubeMesh(Block& block)
 	Vector3 rtf((x * 2 * _blockSize + X) + _blockSize, (y * 2 * _blockSize + Y) + _blockSize, (z * 2 * _blockSize + Z) + _blockSize);
 
 	// near face
-	_buffer.push_back(makeFace(Vertex(lbn), Vertex(rbn), Vertex(rtn), block.t, true));
-	_buffer.push_back(makeFace(Vertex(rtn), Vertex(ltn), Vertex(lbn), block.t, false));
+	_buffer.push_back(makeFace(Vertex(lbn), Vertex(rbn), Vertex(rtn), block, true));
+	_buffer.push_back(makeFace(Vertex(rtn), Vertex(ltn), Vertex(lbn), block, false));
 
 	// far face
-	_buffer.push_back(makeFace(Vertex(lbf), Vertex(rbf), Vertex(rtf), block.t, true));
-	_buffer.push_back(makeFace(Vertex(rtf), Vertex(ltf), Vertex(lbf), block.t, false));
+	_buffer.push_back(makeFace(Vertex(lbf), Vertex(rbf), Vertex(rtf), block, true));
+	_buffer.push_back(makeFace(Vertex(rtf), Vertex(ltf), Vertex(lbf), block, false));
 
 	// left face
-	_buffer.push_back(makeFace(Vertex(lbn), Vertex(ltn), Vertex(ltf), block.t, true));
-	_buffer.push_back(makeFace(Vertex(ltf), Vertex(lbf), Vertex(lbn), block.t, false));
+	_buffer.push_back(makeFace(Vertex(lbn), Vertex(ltn), Vertex(ltf), block, true));
+	_buffer.push_back(makeFace(Vertex(ltf), Vertex(lbf), Vertex(lbn), block, false));
 
 	// right face
-	_buffer.push_back(makeFace(Vertex(rbn), Vertex(rtn), Vertex(rtf), block.t, true));
-	_buffer.push_back(makeFace(Vertex(rtf), Vertex(rbf), Vertex(rbn), block.t, false));
+	_buffer.push_back(makeFace(Vertex(rbn), Vertex(rtn), Vertex(rtf), block, true));
+	_buffer.push_back(makeFace(Vertex(rtf), Vertex(rbf), Vertex(rbn), block, false));
 
 	// top face
-	_buffer.push_back(makeFace(Vertex(ltn), Vertex(ltf), Vertex(rtf), block.t, true));
-	_buffer.push_back(makeFace(Vertex(rtf), Vertex(rtn), Vertex(ltn), block.t, false));
+	_buffer.push_back(makeFace(Vertex(ltn), Vertex(ltf), Vertex(rtf), block, true));
+	_buffer.push_back(makeFace(Vertex(rtf), Vertex(rtn), Vertex(ltn), block, false));
 
 	// bottom face
-	_buffer.push_back(makeFace(Vertex(lbn), Vertex(lbf), Vertex(rbf), block.t, true));
-	_buffer.push_back(makeFace(Vertex(rbf), Vertex(rbn), Vertex(lbn), block.t, false));
+	_buffer.push_back(makeFace(Vertex(lbn), Vertex(lbf), Vertex(rbf), block, true));
+	_buffer.push_back(makeFace(Vertex(rbf), Vertex(rbn), Vertex(lbn), block, false));
 }
 
-Chunk::Triangle Chunk::makeFace(Vertex& v1, Vertex& v2, Vertex& v3, uint8_t t, bool firstHalf)
+Chunk::Triangle Chunk::makeFace(Vertex& v1, Vertex& v2, Vertex& v3, Block block, bool firstHalf)
 {
 	// calculate the normal of the triangle
 
@@ -179,27 +181,19 @@ Chunk::Triangle Chunk::makeFace(Vertex& v1, Vertex& v2, Vertex& v3, uint8_t t, b
 	v3.normal.set(n);
 
 	// set vertex texture coordinates
+	Texture::TextureRegion region = VoxelEngine::getEngine()->getRenderer().getTextureManager().getAtlas(_atlasName).getRegion(block);
+
 	if (firstHalf)
 	{
-		v1.texCoord.x = 0;
-		v1.texCoord.y = 0;
-
-		v2.texCoord.x = 0;
-		v2.texCoord.y = 1;
-		
-		v3.texCoord.x = 1;
-		v3.texCoord.y = 1;
+		v1.texCoord = region.bottomLeft;
+		v2.texCoord = region.topLeft;
+		v3.texCoord = region.topRight;
 	}
 	else
 	{
-		v1.texCoord.x = 0;
-		v1.texCoord.y = 0;
-
-		v2.texCoord.x = 1;
-		v2.texCoord.y = 0;
-
-		v3.texCoord.x = 1;
-		v3.texCoord.y = 1;
+		v1.texCoord = region.bottomLeft;
+		v2.texCoord = region.bottomRight;
+		v3.texCoord = region.topRight;
 	}
 
 	//
@@ -248,9 +242,14 @@ void Chunk::setLocation(int x, int y, int z)
 	_hasLocation = true;
 }
 
-sgl::Vector3 Chunk::getLocation(void)
+Vector3 Chunk::getLocation(void)
 {
 	return _offset;
+}
+
+void Chunk::setAtlasName(const std::string& name)
+{
+	_atlasName = name;
 }
 
 Chunk::~Chunk()

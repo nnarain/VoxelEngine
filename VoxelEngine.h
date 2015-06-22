@@ -26,6 +26,7 @@ namespace engine
 		void createWindow(const char * title, int width, int height);
 
 		void loadTexture(const char *textureName);
+		void loadAtlas(const char *atlasName);
 
 		FPSCamera* getCamera();
 

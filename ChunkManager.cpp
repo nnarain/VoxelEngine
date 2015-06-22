@@ -4,17 +4,18 @@
 using namespace engine;
 using namespace sgl;
 
-ChunkManager::ChunkManager(int x, int y, int z) : ChunkManager(x, y, z, 16, 1)
+ChunkManager::ChunkManager(int x, int y, int z, const char *atlasName) : ChunkManager(x, y, z, 16, 1, atlasName)
 {
 }
 
-ChunkManager::ChunkManager(int x, int y, int z, int blocksPerChunk, float blockSize) :
+ChunkManager::ChunkManager(int x, int y, int z, int blocksPerChunk, float blockSize, const char *atlasName) :
 	_blockX(x),
 	_blockY(y),
 	_blockZ(z),
 	_blocksPerChunk(blocksPerChunk),
 	_blockSize(blockSize),
-	_rebuildsPerFrame(5)
+	_rebuildsPerFrame(5),
+	_atlasName(atlasName)
 {
 	allocateChunks(blocksPerChunk, blockSize);
 
@@ -339,6 +340,8 @@ void ChunkManager::allocateChunks(int chunkSize, float blockSize)
 	for (i = 0; i < chunksToAllocate; ++i)
 	{
 		Chunk* chunk = new Chunk(chunkSize, blockSize);
+		chunk->setAtlasName(_atlasName);
+
 		initChunk(chunk);
 		_chunks.push_back(chunk);
 	}

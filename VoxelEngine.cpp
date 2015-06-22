@@ -110,6 +110,11 @@ void VoxelEngine::loadTexture(const char *textureName)
 	_renderer->getTextureManager().addTexture(textureName);
 }
 
+void VoxelEngine::loadAtlas(const char *atlasName)
+{
+	_renderer->getTextureManager().addAtlas(atlasName);
+}
+
 Renderer& VoxelEngine::getRenderer()
 {
 	return *_renderer;
@@ -136,4 +141,6 @@ VoxelEngine::~VoxelEngine()
 	if (_window != nullptr)   delete _window;
 	if (_renderer != nullptr) delete _renderer;
 }
+
+
 

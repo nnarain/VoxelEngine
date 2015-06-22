@@ -34,7 +34,8 @@ void ScriptEngine::init()
 			.def("getWindow",    &VoxelEngine::getWindow)
 			.def("addManager",   &VoxelEngine::addChunkManager)
 			.def("updateCamera", &VoxelEngine::updateCamera)
-			.def("loadTexture",  &VoxelEngine::loadTexture),
+			.def("loadTexture",  &VoxelEngine::loadTexture)
+			.def("loadAtlas",    &VoxelEngine::loadAtlas),
 
 		class_<Block>("Block")
 			.def_readonly("t", &Block::t)
@@ -43,8 +44,8 @@ void ScriptEngine::init()
 			.def_readonly("z", &Block::z),
 
 		class_<ChunkManager>("ChunkManager")
-			.def(constructor<int, int, int>())
-			.def(constructor<int, int, int, int, float>())
+			.def(constructor<int, int, int, const char *>())
+			.def(constructor<int, int, int, int, float, const char *>())
 			.def("getBlock", &ChunkManager::getBlock)
 			.def("setBlock", &ChunkManager::setBlock)
 			.def("setAtlasName", &ChunkManager::setAtlasName),

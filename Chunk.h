@@ -7,6 +7,7 @@
 #include <SGL/GL/Mesh.h>
 
 #include <vector>
+#include <string>
 
 namespace engine
 {
@@ -35,6 +36,8 @@ namespace engine
 		void setLocation(int x, int y, int z);
 		sgl::Vector3 getLocation(void);
 
+		void setAtlasName(const std::string& name);
+
 	private:
 		//
 		struct Triangle
@@ -57,6 +60,8 @@ namespace engine
 		std::vector<Block> _blocks;
 		std::vector<bool> _hasLocationFlags;
 
+		std::string _atlasName;
+
 		int _size;
 		float _blockSize;
 
@@ -69,7 +74,7 @@ namespace engine
 
 		bool isSurrounded(Block& block);
 
-		Triangle makeFace(Vertex& v1, Vertex& v2, Vertex& v3, uint8_t t, bool firstHalf);
+		Triangle makeFace(Vertex& v1, Vertex& v2, Vertex& v3, Block block, bool firstHalf);
 	};
 }
 

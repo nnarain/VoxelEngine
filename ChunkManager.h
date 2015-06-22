@@ -26,12 +26,12 @@ namespace engine
 			chunkSize - number of blocks per chunk
 			blockSize - half the render size of the block
 		*/
-		ChunkManager(int x, int y, int z, int blocksPerChunk, float blockSize);
+		ChunkManager(int x, int y, int z, int blocksPerChunk, float blockSize, const char *atlasName);
 
 		/**
 			(x, y, z) - grid dimensions in blocks
 		*/
-		ChunkManager(int x, int y, int z);
+		ChunkManager(int x, int y, int z, const char *atlasName);
 
 		~ChunkManager();
 
