@@ -38,6 +38,10 @@ void Chunk::setBlock(int x, int y, int z, int t)
 
 Block& Chunk::getBlock(int x, int y, int z)
 {
+	if (x < 0) x = 0;
+	if (y < 0) y = 0;
+	if (z < 0) z = 0;
+
 	int idx = (x * _size) + (y * _size * _size) + z;
 
 	Block& block = _blocks[idx];
@@ -132,31 +136,31 @@ void Chunk::createCubeMesh(Block& block)
 	Vector3 rtf((x * 2 * _blockSize + X) + _blockSize, (y * 2 * _blockSize + Y) + _blockSize, (z * 2 * _blockSize + Z) + _blockSize);
 
 	// near face
-	_buffer.push_back(makeFace(Vertex(lbn), Vertex(rbn), Vertex(rtn), block.t));
-	_buffer.push_back(makeFace(Vertex(rtn), Vertex(ltn), Vertex(lbn), block.t));
+	_buffer.push_back(makeFace(Vertex(lbn), Vertex(rbn), Vertex(rtn), block.t, true));
+	_buffer.push_back(makeFace(Vertex(rtn), Vertex(ltn), Vertex(lbn), block.t, false));
 
 	// far face
-	_buffer.push_back(makeFace(Vertex(lbf), Vertex(rbf), Vertex(rtf), block.t));
-	_buffer.push_back(makeFace(Vertex(rtf), Vertex(ltf), Vertex(lbf), block.t));
+	_buffer.push_back(makeFace(Vertex(lbf), Vertex(rbf), Vertex(rtf), block.t, true));
+	_buffer.push_back(makeFace(Vertex(rtf), Vertex(ltf), Vertex(lbf), block.t, false));
 
 	// left face
-	_buffer.push_back(makeFace(Vertex(lbn), Vertex(ltn), Vertex(ltf), block.t));
-	_buffer.push_back(makeFace(Vertex(ltf), Vertex(lbf), Vertex(lbn), block.t));
+	_buffer.push_back(makeFace(Vertex(lbn), Vertex(ltn), Vertex(ltf), block.t, true));
+	_buffer.push_back(makeFace(Vertex(ltf), Vertex(lbf), Vertex(lbn), block.t, false));
 
 	// right face
-	_buffer.push_back(makeFace(Vertex(rbn), Vertex(rtn), Vertex(rtf), block.t));
-	_buffer.push_back(makeFace(Vertex(rtf), Vertex(rbf), Vertex(rbn), block.t));
+	_buffer.push_back(makeFace(Vertex(rbn), Vertex(rtn), Vertex(rtf), block.t, true));
+	_buffer.push_back(makeFace(Vertex(rtf), Vertex(rbf), Vertex(rbn), block.t, false));
 
 	// top face
-	_buffer.push_back(makeFace(Vertex(ltn), Vertex(ltf), Vertex(rtf), block.t));
-	_buffer.push_back(makeFace(Vertex(rtf), Vertex(rtn), Vertex(ltn), block.t));
+	_buffer.push_back(makeFace(Vertex(ltn), Vertex(ltf), Vertex(rtf), block.t, true));
+	_buffer.push_back(makeFace(Vertex(rtf), Vertex(rtn), Vertex(ltn), block.t, false));
 
 	// bottom face
-	_buffer.push_back(makeFace(Vertex(lbn), Vertex(lbf), Vertex(rbf), block.t));
-	_buffer.push_back(makeFace(Vertex(rbf), Vertex(rbn), Vertex(lbn), block.t));
+	_buffer.push_back(makeFace(Vertex(lbn), Vertex(lbf), Vertex(rbf), block.t, true));
+	_buffer.push_back(makeFace(Vertex(rbf), Vertex(rbn), Vertex(lbn), block.t, false));
 }
 
-Chunk::Triangle Chunk::makeFace(Vertex& v1, Vertex& v2, Vertex& v3, uint8_t t)
+Chunk::Triangle Chunk::makeFace(Vertex& v1, Vertex& v2, Vertex& v3, uint8_t t, bool firstHalf)
 {
 	// calculate the normal of the triangle
 
@@ -166,7 +170,7 @@ Chunk::Triangle Chunk::makeFace(Vertex& v1, Vertex& v2, Vertex& v3, uint8_t t)
 
 	// the perpendicular vector to the edges is the normal
 
-	//normal
+	// normal
 	Vector3 n;
 	n.set(u).cross(v).normalize();
 
@@ -175,6 +179,28 @@ Chunk::Triangle Chunk::makeFace(Vertex& v1, Vertex& v2, Vertex& v3, uint8_t t)
 	v3.normal.set(n);
 
 	// set vertex texture coordinates
+	if (firstHalf)
+	{
+		v1.texCoord.x = 0;
+		v1.texCoord.y = 0;
+
+		v2.texCoord.x = 0;
+		v2.texCoord.y = 1;
+		
+		v3.texCoord.x = 1;
+		v3.texCoord.y = 1;
+	}
+	else
+	{
+		v1.texCoord.x = 0;
+		v1.texCoord.y = 0;
+
+		v2.texCoord.x = 1;
+		v2.texCoord.y = 0;
+
+		v3.texCoord.x = 1;
+		v3.texCoord.y = 1;
+	}
 
 	//
 	return Triangle(v1, v2, v3);
@@ -218,6 +244,8 @@ void Chunk::setLocation(int x, int y, int z)
 	_offset.x = (float)x;
 	_offset.y = (float)y;
 	_offset.z = (float)z;
+
+	_hasLocation = true;
 }
 
 sgl::Vector3 Chunk::getLocation(void)

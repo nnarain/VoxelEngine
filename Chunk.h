@@ -69,7 +69,7 @@ namespace engine
 
 		bool isSurrounded(Block& block);
 
-		Triangle makeFace(Vertex& v1, Vertex& v2, Vertex& v3, uint8_t t);
+		Triangle makeFace(Vertex& v1, Vertex& v2, Vertex& v3, uint8_t t, bool firstHalf);
 	};
 }
 

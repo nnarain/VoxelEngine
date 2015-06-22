@@ -7,7 +7,7 @@
 #define GLSL(src) "\n" #src
 
 //
-static std::string GLSL_VERTEX_NORMAL_TEXTURE_VERT = GLSL(
+static const std::string GLSL_VERTEX_NORMAL_TEXTURE_VERT = GLSL(
 
 	in vec3 vPosition;
 	in vec3 vNormal;
@@ -16,7 +16,6 @@ static std::string GLSL_VERTEX_NORMAL_TEXTURE_VERT = GLSL(
 	out vec3 fNormal;
 	out vec2 fTexCoord;
 	
-	uniform mat4 M;
 	uniform mat4 MVP;
 
 	void main()
@@ -28,7 +27,7 @@ static std::string GLSL_VERTEX_NORMAL_TEXTURE_VERT = GLSL(
 	}
 );
 
-static std::string GLSL_VERTEX_NORMAL_TEXTURE_FRAG = GLSL(
+static const std::string GLSL_VERTEX_NORMAL_TEXTURE_FRAG = GLSL(
 
 	out vec4 fragColor;
 

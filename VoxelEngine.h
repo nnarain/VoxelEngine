@@ -25,6 +25,8 @@ namespace engine
 
 		void createWindow(const char * title, int width, int height);
 
+		void loadTexture(const char *textureName);
+
 		FPSCamera* getCamera();
 
 		gui::Window* getWindow();

@@ -25,6 +25,16 @@ void Window::pollEvents()
 	glfwPollEvents();
 }
 
+sgl::Vector2 Window::getMousePosition()
+{
+	double x, y;
+	glfwGetCursorPos(_window, &x, &y);
+
+	float invY = (float)(-1) * (y - (float)_height);
+
+	return sgl::Vector2(x, y);
+}
+
 void Window::setMousePosition(float x, float y)
 {
 	glfwSetCursorPos(_window, x, y);

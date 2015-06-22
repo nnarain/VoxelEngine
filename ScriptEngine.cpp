@@ -29,11 +29,12 @@ void ScriptEngine::init()
 			.scope[
 				def("getEngine", &VoxelEngine::getEngine)
 			]
-			.def("render", &VoxelEngine::render)
+			.def("render",       &VoxelEngine::render)
 			.def("createWindow", &VoxelEngine::createWindow)
-			.def("getWindow", &VoxelEngine::getWindow)
-			.def("addManager", &VoxelEngine::addChunkManager)
-			.def("updateCamera", &VoxelEngine::updateCamera),
+			.def("getWindow",    &VoxelEngine::getWindow)
+			.def("addManager",   &VoxelEngine::addChunkManager)
+			.def("updateCamera", &VoxelEngine::updateCamera)
+			.def("loadTexture",  &VoxelEngine::loadTexture),
 
 		class_<Block>("Block")
 			.def_readonly("t", &Block::t)
@@ -45,13 +46,14 @@ void ScriptEngine::init()
 			.def(constructor<int, int, int>())
 			.def(constructor<int, int, int, int, float>())
 			.def("getBlock", &ChunkManager::getBlock)
-			.def("setBlock", &ChunkManager::setBlock),
+			.def("setBlock", &ChunkManager::setBlock)
+			.def("setAtlasName", &ChunkManager::setAtlasName),
 
 		class_<gui::Window>("Window")
 			.def(constructor<const char*, int, int>())
-			.def("shouldClose", &gui::Window::shouldClose)
-			.def("pollEvents",  &gui::Window::pollEvents)
-			.def("swapBuffers", &gui::Window::swapBuffers)
+			.def("shouldClose",      &gui::Window::shouldClose)
+			.def("pollEvents",       &gui::Window::pollEvents)
+			.def("swapBuffers",      &gui::Window::swapBuffers)
 			.def("setMousePosition", &gui::Window::setMousePosition),
 
 		class_<Timer>("Timer")

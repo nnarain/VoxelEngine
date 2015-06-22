@@ -33,7 +33,7 @@ void FPSCamera::update(float delta)
 	calculateView();
 
 	// update the player position
-	updatePosition(delta);
+//	updatePosition(delta);
 
 	// update the player projection
 

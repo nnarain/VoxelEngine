@@ -24,11 +24,18 @@ void VoxelEngine::render()
 		_updateChunks = false;
 	}
 
-	std::set<ChunkManager*>::iterator iter;
-	for (iter = _chunkManagers.begin(); iter != _chunkManagers.end(); ++iter)
+	Matrix4 VP = _camera.getProjection() * _camera.getView();
+
+	_renderer->begin();
 	{
-		ChunkManager* manager = (*iter);
+		std::set<ChunkManager*>::iterator iter;
+		for (iter = _chunkManagers.begin(); iter != _chunkManagers.end(); ++iter)
+		{
+			ChunkManager* manager = (*iter);
+			_renderer->render(*manager, VP);
+		}
 	}
+	_renderer->end();
 }
 
 void VoxelEngine::addChunkManager(ChunkManager* manager)
@@ -51,13 +58,11 @@ void VoxelEngine::updateCamera(float delta)
 	static Vector3 cameraPosition;
 	static Vector3 cameraDirection;
 
-	GLFWwindow* gWindow = _window->getWindow();
+	Vector2 mousePos = _window->getMousePosition();
+	_window->setMousePosition(_window->getWidth() / 2, _window->getHeight() / 2);
 
-	double x, y;
-	glfwGetCursorPos(gWindow, &x, &y);
-	glfwSetCursorPos(gWindow, _window->getWidth() / 2, _window->getHeight() / 2);
-
-	_camera.updateLookDirection((float)x, (float)y, delta);
+	_camera.updateLookDirection(mousePos.x, mousePos.y, delta);
+	_camera.update(delta);
 
 	//
 	Vector3& currentPosition = _camera.getPosition();
@@ -98,6 +103,11 @@ void VoxelEngine::initializeContext()
 
 	_renderer = new Renderer();
 	_renderer->init();
+}
+
+void VoxelEngine::loadTexture(const char *textureName)
+{
+	_renderer->getTextureManager().addTexture(textureName);
 }
 
 Renderer& VoxelEngine::getRenderer()

@@ -4,6 +4,7 @@
 
 
 Debug/
+assets/
 
 *.o
 *.obj

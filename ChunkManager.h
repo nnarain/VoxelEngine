@@ -5,8 +5,11 @@
 #include "Chunk.h"
 #include "FPSCamera.h"
 
+#include <SGL/Math/Matrix4.h>
+
 #include <vector>
 #include <set>
+#include <string>
 
 namespace engine
 {
@@ -23,7 +26,7 @@ namespace engine
 			chunkSize - number of blocks per chunk
 			blockSize - half the render size of the block
 		*/
-		ChunkManager(int x, int y, int z, int chunkSize, float blockSize);
+		ChunkManager(int x, int y, int z, int blocksPerChunk, float blockSize);
 
 		/**
 			(x, y, z) - grid dimensions in blocks
@@ -70,16 +73,28 @@ namespace engine
 		int getBlockY() const;
 		int getBlockZ() const;
 
+		sgl::Matrix4& getModelMatrix();
+
+		void setAtlasName(const std::string& name);
+		std::string getAtlasName();
+
 	private:
 
 		int _blockX;      // number of block in the x direction
 		int _blockY;      // number of block in the y direction
 		int _blockZ;      // number of block in the z direction
 
-		int   _chunkSize;   // number of blocks in one dimesnsion of the chunk
+		int   _blocksPerChunk;   // number of blocks in one dimesnsion of the chunk
 		float _blockSize; // half size of block
 
+
+		int _size;
+
 		int _rebuildsPerFrame;
+
+		sgl::Matrix4 _modelMatrix;
+
+		std::string _atlasName;
 
 		ChunkList _chunks;
 		ChunkSet  _chunkRenderSet;

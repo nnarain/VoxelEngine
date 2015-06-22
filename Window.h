@@ -5,6 +5,8 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#include <SGL/Math/Vector2.h>
+
 #include <string>
 
 namespace engine
@@ -25,6 +27,7 @@ namespace engine
 			void pollEvents();
 
 			void setMousePosition(float x, float y);
+			sgl::Vector2 getMousePosition();
 
 			void swapBuffers();
 

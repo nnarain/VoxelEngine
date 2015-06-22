@@ -5,6 +5,7 @@
 #include "GL/glew.h"
 
 #include <SGL/Util/Exception.h>
+#include <SGL/Math/Vector3.h>
 
 #include <iostream>
 
@@ -13,6 +14,7 @@ using namespace sgl;
 
 Renderer::Renderer(void)
 {
+
 }
 
 void Renderer::init()
@@ -49,13 +51,33 @@ void Renderer::begin()
 	_chunkShader.begin();
 }
 
-void Renderer::render(ChunkManager& chunkManager)
+void Renderer::render(ChunkManager& chunkManager, Matrix4& VP)
 {
+	Matrix4& M = chunkManager.getModelMatrix();
+	Matrix4 MVP = VP * M;
+
+	_chunkShader["MVP"].set(MVP);
+
+	std::string atlasName = chunkManager.getAtlasName();
+
+	Texture& texture = _textureManager.getTexture(atlasName);
+	texture.bind(Texture::Unit::T0);
+
+	_chunkShader["blockTexture"].set(texture);
+
+	chunkManager.render();
+
+	texture.unbind();
 }
 
 void Renderer::end()
 {
 	_chunkShader.end();
+}
+
+TextureManager& Renderer::getTextureManager()
+{
+	return _textureManager;
 }
 
 Renderer::~Renderer()
