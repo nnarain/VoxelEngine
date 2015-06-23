@@ -2,9 +2,10 @@
 #include "ScriptEngine.h"
 
 // exported classes
+#include "VoxelEngine.h"
 #include "Window.h"
 #include "Timer.h"
-#include "VoxelEngine.h"
+#include "Noise.h"
 
 using namespace engine;
 using namespace engine::script;
@@ -56,6 +57,11 @@ void ScriptEngine::init()
 			.def("pollEvents",       &gui::Window::pollEvents)
 			.def("swapBuffers",      &gui::Window::swapBuffers)
 			.def("setMousePosition", &gui::Window::setMousePosition),
+
+		class_<noise::Noise>("Noise")
+			.def(constructor<int, int>())
+			.def("generate", &noise::Noise::generate)
+			.def("at",       &noise::Noise::at),
 
 		class_<Timer>("Timer")
 			.def(constructor<>())

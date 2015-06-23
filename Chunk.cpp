@@ -3,6 +3,8 @@
 
 #include "VoxelEngine.h"
 
+#include <iostream>
+
 using namespace engine;
 using namespace sgl;
 
@@ -206,16 +208,21 @@ bool Chunk::isSurrounded(Block& block)
 	int y = block.y;
 	int z = block.z;
 
-	// get the adjacent blocks
+	if ((x - 1 > 0 && x + 1 < _size) && (x - 1 > 0 && x + 1 < _size) && (y - 1 > 0 && y + 1 < _size) && (z - 1 > 0 && z + 1 < _size))
+	{
+		// get the adjacent blocks
 
-	Block& l = getBlock(x - 1, y, z);
-	Block& r = getBlock(x + 1, y, z);
-	Block& t = getBlock(x, y + 1, z);
-	Block& b = getBlock(x, y - 1, z);
-	Block& n = getBlock(x, y, z - 1);
-	Block& f = getBlock(x, y, z + 1);
+		Block& l = getBlock(x - 1, y, z);
+		Block& r = getBlock(x + 1, y, z);
+		Block& t = getBlock(x, y + 1, z);
+		Block& b = getBlock(x, y - 1, z);
+		Block& n = getBlock(x, y, z - 1);
+		Block& f = getBlock(x, y, z + 1);
 
-	return l.t && r.t && t.t && b.t && n.t && f.t;
+		return l.t && r.t && t.t && b.t && n.t && f.t;
+	}
+
+	return false;
 }
 
 bool Chunk::isSetup(void) const
