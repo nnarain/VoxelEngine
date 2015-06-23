@@ -187,15 +187,15 @@ Chunk::Triangle Chunk::makeFace(Vertex& v1, Vertex& v2, Vertex& v3, Block block,
 
 	if (firstHalf)
 	{
-		v1.texCoord = region.bottomLeft;
-		v2.texCoord = region.topLeft;
-		v3.texCoord = region.topRight;
+		v1.texCoord = region.topLeft;
+		v2.texCoord = region.bottomLeft;
+		v3.texCoord = region.bottomRight;
 	}
 	else
 	{
-		v1.texCoord = region.bottomLeft;
-		v2.texCoord = region.bottomRight;
-		v3.texCoord = region.topRight;
+		v1.texCoord = region.bottomRight;
+		v2.texCoord = region.topRight;
+		v3.texCoord = region.topLeft;
 	}
 
 	//

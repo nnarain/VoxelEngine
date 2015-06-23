@@ -37,6 +37,10 @@ void TextureAtlas::load(Texture* texture, const std::string& packFilename)
 	read_json(buffer, pt);
 
 	//
+	bool inverted = false;
+	if (pt.count("inverted") == 1) inverted = pt.get<bool>("inverted");
+
+	// get the pixel dimensions to calculate the texture region
 	BOOST_FOREACH(ptree::value_type& v, pt.get_child("atlas"))
 	{
 		float x = v.second.get<float>("x");
@@ -44,9 +48,10 @@ void TextureAtlas::load(Texture* texture, const std::string& packFilename)
 		float w = v.second.get<float>("w");
 		float h = v.second.get<float>("h");
 
-		Texture::TextureRegion region = texture->region(x, y, w, h);
+		//
+		if (inverted) y = texture->getHeight() - y - h;
 
-		_regions.push_back(region);
+		_regions.push_back(texture->region(x, y, w, h));
 	}
 }
 
