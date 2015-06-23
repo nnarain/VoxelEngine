@@ -36,9 +36,8 @@ void TextureAtlas::load(Texture* texture, const std::string& packFilename)
 	// parse out the json file
 	read_json(buffer, pt);
 
-	//
-	bool inverted = false;
-	if (pt.count("inverted") == 1) inverted = pt.get<bool>("inverted");
+	// get the optional inversion value from the json file
+	bool inverted = (pt.count("inverted")) ? pt.get<bool>("inverted") : false;
 
 	// get the pixel dimensions to calculate the texture region
 	BOOST_FOREACH(ptree::value_type& v, pt.get_child("atlas"))
@@ -51,14 +50,13 @@ void TextureAtlas::load(Texture* texture, const std::string& packFilename)
 		//
 		if (inverted) y = texture->getHeight() - y - h;
 
+		//
 		_regions.push_back(texture->region(x, y, w, h));
 	}
 }
 
 Texture::TextureRegion& TextureAtlas::getRegion(Block block)
 {
-	//std::cout << block.x << " " << block.y << " " << block.z << std::endl;
-
 	assert(block.t > 0);
 	return _regions[block.t - 1];
 }
