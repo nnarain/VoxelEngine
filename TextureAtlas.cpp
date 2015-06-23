@@ -4,6 +4,7 @@
 #include <fstream>
 #include <sstream>
 #include <cassert>
+#include <iostream>
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
@@ -51,6 +52,8 @@ void TextureAtlas::load(Texture* texture, const std::string& packFilename)
 
 Texture::TextureRegion& TextureAtlas::getRegion(Block block)
 {
+	//std::cout << block.x << " " << block.y << " " << block.z << std::endl;
+
 	assert(block.t > 0);
 	return _regions[block.t - 1];
 }

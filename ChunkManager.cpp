@@ -342,7 +342,7 @@ void ChunkManager::allocateChunks(int chunkSize, float blockSize)
 		Chunk* chunk = new Chunk(chunkSize, blockSize);
 		chunk->setAtlasName(_atlasName);
 
-		initChunk(chunk);
+//		initChunk(chunk);
 		_chunks.push_back(chunk);
 	}
 }

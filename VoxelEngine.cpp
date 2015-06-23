@@ -12,7 +12,7 @@
 using namespace engine;
 using namespace sgl;
 
-VoxelEngine::VoxelEngine() : _camera(Vector3(10, 10, 10)), _window(nullptr), _renderer(nullptr)
+VoxelEngine::VoxelEngine() : _camera(Vector3(10, 40, 10)), _window(nullptr), _renderer(nullptr)
 {
 }
 
