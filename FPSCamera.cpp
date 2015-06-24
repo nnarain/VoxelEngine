@@ -114,11 +114,6 @@ void FPSCamera::calculateView()
 	_view.lookAt(_position, _position + _direction, up);
 }
 
-void FPSCamera::setState(State state)
-{
-	_state = state;
-}
-
 sgl::Vector3& FPSCamera::getPosition(void)
 {
 	return _position;
