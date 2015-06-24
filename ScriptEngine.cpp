@@ -56,7 +56,47 @@ void ScriptEngine::init()
 			.def("shouldClose",      &gui::Window::shouldClose)
 			.def("pollEvents",       &gui::Window::pollEvents)
 			.def("swapBuffers",      &gui::Window::swapBuffers)
-			.def("setMousePosition", &gui::Window::setMousePosition),
+			.def("setMousePosition", &gui::Window::setMousePosition)
+			.def("isKeyPressed",     &gui::Window::isKeyPressed)
+			.def("isKeyReleased",    &gui::Window::isKeyReleased)
+			
+			// key constants
+			.scope[
+				class_<gui::Window::Key>("Key")
+					.enum_("key_constants")[
+						value("A", GLFW_KEY_A),
+						value("B", GLFW_KEY_B),
+						value("C", GLFW_KEY_C),
+						value("D", GLFW_KEY_D),
+						value("E", GLFW_KEY_E),
+						value("F", GLFW_KEY_F),
+						value("G", GLFW_KEY_G),
+						value("H", GLFW_KEY_H),
+						value("I", GLFW_KEY_I),
+						value("J", GLFW_KEY_J),
+						value("K", GLFW_KEY_K),
+						value("L", GLFW_KEY_L),
+						value("M", GLFW_KEY_M),
+						value("N", GLFW_KEY_N),
+						value("O", GLFW_KEY_O),
+						value("P", GLFW_KEY_P),
+						value("Q", GLFW_KEY_Q),
+						value("R", GLFW_KEY_R),
+						value("S", GLFW_KEY_S),
+						value("T", GLFW_KEY_T),
+						value("U", GLFW_KEY_U),
+						value("V", GLFW_KEY_V),
+						value("W", GLFW_KEY_W),
+						value("X", GLFW_KEY_X),
+						value("Y", GLFW_KEY_Y),
+						value("Z", GLFW_KEY_Z),
+
+						value("SPACE",  GLFW_KEY_SPACE),
+						value("ENTER",  GLFW_KEY_ENTER),
+						value("LCTRL",  GLFW_KEY_LEFT_CONTROL),
+						value("LSHIFT", GLFW_KEY_LEFT_SHIFT)
+					]
+			],
 
 		class_<noise::Noise>("Noise")
 			.def(constructor<int, int>())
