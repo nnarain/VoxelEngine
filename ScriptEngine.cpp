@@ -26,7 +26,7 @@ void ScriptEngine::init()
 
 	luaL_openlibs(_state);
 
-	// export window class
+	// export classes
 	module(_state)[
 
 		class_<VoxelEngine>("Engine")
