@@ -13,12 +13,6 @@ namespace engine
 	{
 	public:
 
-		// State
-		enum class State
-		{
-			STAND
-		};
-
 		enum class Direction
 		{
 			POS, NEG, NEU
@@ -30,8 +24,6 @@ namespace engine
 		void update(float delta);
 
 		void updateLookDirection(float x, float y, float delta);
-
-		void setState(State state);
 
 		sgl::Vector3& getPosition(void);
 		sgl::Vector3& getDirection(void);
@@ -50,8 +42,6 @@ namespace engine
 		void setVerticalVelocity(float v);
 
 	private:
-
-		State _state;
 
 		Direction _xDir;
 		Direction _zDir;

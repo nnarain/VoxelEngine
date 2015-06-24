@@ -25,6 +25,16 @@ void Window::pollEvents()
 	glfwPollEvents();
 }
 
+bool Window::isKeyPressed(int key)
+{
+	return glfwGetKey(_window, key) == GLFW_PRESS;
+}
+
+bool Window::isKeyReleased(int key)
+{
+	return glfwGetKey(_window, key) == GLFW_RELEASE;
+}
+
 sgl::Vector2 Window::getMousePosition()
 {
 	double x, y;

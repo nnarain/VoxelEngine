@@ -17,6 +17,9 @@ namespace engine
 		{
 		public:
 
+			// empty struct for lua binding
+			struct Key{};
+
 			/**
 				Create a window with a title and dimensions
 			*/
@@ -25,6 +28,9 @@ namespace engine
 
 			bool shouldClose();
 			void pollEvents();
+
+			bool isKeyPressed(int key);
+			bool isKeyReleased(int key);
 
 			void setMousePosition(float x, float y);
 			sgl::Vector2 getMousePosition();
