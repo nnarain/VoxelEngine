@@ -13,11 +13,6 @@ namespace engine
 	{
 	public:
 
-		enum class Direction
-		{
-			POS, NEG, NEU
-		};
-
 		FPSCamera();
 		FPSCamera(const sgl::Vector3& position);
 
@@ -33,27 +28,20 @@ namespace engine
 
 		sgl::Frustum& getFrustum(void);
 
-		void setXDirection(Direction d);
-		void setZDirection(Direction d);
-
 		void incrementFOV(float inc);
 
 		sgl::Vector3& getVerticalVelocity(void);
 		void setVerticalVelocity(float v);
 
+	public:
+		sgl::Vector3 position;
+		sgl::Vector3 direction;
+		sgl::Vector3 right;
+
 	private:
-
-		Direction _xDir;
-		Direction _zDir;
-
-		sgl::Vector3 _position;
-		sgl::Vector3 _direction;
-		sgl::Vector3 _right;
 
 		sgl::Matrix4 _view;
 		sgl::Matrix4 _proj;
-
-		sgl::Vector3 _verticalVelocity;
 
 		sgl::Frustum _frustum;
 
@@ -62,9 +50,8 @@ namespace engine
 		float _lookAngleH;
 		float _lookAngleV;
 
-		/*  */
+	private:
 		void calculateView();
-
 		void updatePosition(float delta);
 
 	};

@@ -6,6 +6,9 @@
 #include "Window.h"
 #include "Timer.h"
 #include "Noise.h"
+#include "FPSCamera.h"
+
+#include <SGL/Math/Vector3.h>
 
 using namespace engine;
 using namespace engine::script;
@@ -30,13 +33,14 @@ void ScriptEngine::init()
 			.scope[
 				def("getEngine", &VoxelEngine::getEngine)
 			]
-			.def("render",       &VoxelEngine::render)
-			.def("createWindow", &VoxelEngine::createWindow)
-			.def("getWindow",    &VoxelEngine::getWindow)
-			.def("addManager",   &VoxelEngine::addChunkManager)
-			.def("updateCamera", &VoxelEngine::updateCamera)
-			.def("loadTexture",  &VoxelEngine::loadTexture)
-			.def("loadAtlas",    &VoxelEngine::loadAtlas),
+			.def("render",           &VoxelEngine::render)
+			.def("createWindow",     &VoxelEngine::createWindow)
+			.def("getWindow",        &VoxelEngine::getWindow)
+			.def("getCamera",        &VoxelEngine::getCamera)
+			.def("addManager",       &VoxelEngine::addChunkManager)
+			.def("updateCameraView", &VoxelEngine::updateCamera)
+			.def("loadTexture",      &VoxelEngine::loadTexture)
+			.def("loadAtlas",        &VoxelEngine::loadAtlas),
 
 		class_<Block>("Block")
 			.def_readonly("t", &Block::t)
@@ -50,6 +54,11 @@ void ScriptEngine::init()
 			.def("getBlock", &ChunkManager::getBlock)
 			.def("setBlock", &ChunkManager::setBlock)
 			.def("setAtlasName", &ChunkManager::setAtlasName),
+
+		class_<FPSCamera>("Camera")
+			.def_readwrite("position",  &FPSCamera::position)
+			.def_readwrite("direction", &FPSCamera::direction)
+			.def_readwrite("right",     &FPSCamera::right),
 
 		class_<gui::Window>("Window")
 			.def(constructor<const char*, int, int>())
@@ -105,7 +114,18 @@ void ScriptEngine::init()
 
 		class_<Timer>("Timer")
 			.def(constructor<>())
-			.def("getElapsed", &Timer::getElapsed)
+			.def("getElapsed", &Timer::getElapsed),
+
+		class_<sgl::Vector3>("Vector3")
+			.def(constructor<float, float, float>())
+			.def_readwrite("x", &sgl::Vector3::x)
+			.def_readwrite("y", &sgl::Vector3::y)
+			.def_readwrite("z", &sgl::Vector3::z)
+
+			.def(self + other<sgl::Vector3>())
+			.def(self - other<sgl::Vector3>())
+			.def(self * float())
+			.def(self / float())
 	];
 
 }

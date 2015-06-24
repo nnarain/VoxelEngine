@@ -4,6 +4,7 @@
 
 #include <lua.hpp>
 #include <luabind/luabind.hpp>
+#include <luabind/operator.hpp>
 
 #include <string>
 
