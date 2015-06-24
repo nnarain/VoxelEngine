@@ -7,6 +7,7 @@
 #include <SGL/Util/Exception.h>
 
 #include <iostream>
+#include <string>
 
 #define VERSION "1.0"
 
@@ -17,7 +18,7 @@ using namespace engine::script;
 
 /* Prototypes */
 
-static void scriptError(const char *what);
+static void scriptError(const std::string &what);
 
 static void registerUICallbacks(gui::Window* window);
 
@@ -93,7 +94,7 @@ void onMouseMove(GLFWwindow* window, double x, double y)
 	g_ScriptEngine->callFunction("onMouseMove", x, y);
 }
 
-void scriptError(const char *what)
+void scriptError(const std::string& what)
 {
 	std::cout << what << std::endl;
 }

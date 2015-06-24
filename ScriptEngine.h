@@ -17,7 +17,7 @@ namespace engine
 		public:
 
 			// Error Callback
-			typedef void(*ErrorCallback)(const char *);
+			typedef void(*ErrorCallback)(const std::string& what);
 
 			ScriptEngine();
 			~ScriptEngine();
