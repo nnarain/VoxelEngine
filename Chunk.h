@@ -70,9 +70,7 @@ namespace engine
 
 		bool _hasLocation;
 
-		void createCubeMesh(Block& block);
-
-		bool isSurrounded(Block& block);
+		void createCubeMesh(Block& block, bool l, bool r, bool t, bool b, bool n, bool far);
 
 		Triangle makeFace(Vertex& v1, Vertex& v2, Vertex& v3, Block block, bool firstHalf);
 	};

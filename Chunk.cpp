@@ -86,10 +86,31 @@ void Chunk::build()
 			{
 				Block& block = getBlock(x, y, z);
 
-				// add this block if it is active and is not surrounded
-				if (block.t && !isSurrounded(block))
+				// add this block if it is active
+				if (block.t)
 				{
-					createCubeMesh(block);
+					// check if the adjacent blocks are active, if so don't create the joining face in the mesh
+					bool l = true, r = true, t = true, b = true, n = true, f = true;
+
+					if ((int)block.x - 1 >= 0 && block.x + 1 < _size)
+						l = getBlock(block.x - 1, block.y, block.z).t == 0;
+
+					if ((int)block.x - 1 >= 0 && block.x + 1 < _size)
+						r = getBlock(block.x + 1, block.y, block.z).t == 0;
+
+					if ((int)block.y - 1 >= 0 && block.y + 1 < _size)
+						t = getBlock(block.x, block.y + 1, block.z).t == 0;
+
+					if ((int)block.y - 1 >= 0 && block.y + 1 < _size)
+						b = getBlock(block.x, block.y - 1, block.z).t == 0;
+
+					if ((int)block.z - 1 >= 0 && block.z + 1 < _size)
+						n = getBlock(block.x, block.y, block.z -1).t == 0;
+
+					if ((int)block.z - 1 >= 0 && block.z + 1< _size)
+						f = getBlock(block.x, block.y, block.z + 1).t == 0;
+
+					createCubeMesh(block, l, r, t, b, n, f);
 					_shouldRender = true;
 				}
 			}
@@ -115,7 +136,7 @@ void Chunk::build()
 	_dirty = false;
 }
 
-void Chunk::createCubeMesh(Block& block)
+void Chunk::createCubeMesh(Block& block, bool l, bool r, bool t, bool b, bool n, bool f)
 {
 	// create the 8 vertices that make up the cube
 	// l - left, r - right  (x axis)
@@ -140,28 +161,46 @@ void Chunk::createCubeMesh(Block& block)
 	Vector3 rtf((x * 2 * _blockSize + X) + _blockSize, (y * 2 * _blockSize + Y) + _blockSize, (z * 2 * _blockSize + Z) + _blockSize);
 
 	// near face
-	_buffer.push_back(makeFace(Vertex(lbn), Vertex(rbn), Vertex(rtn), block, true));
-	_buffer.push_back(makeFace(Vertex(rtn), Vertex(ltn), Vertex(lbn), block, false));
+	if (n)
+	{
+		_buffer.push_back(makeFace(Vertex(lbn), Vertex(rbn), Vertex(rtn), block, true));
+		_buffer.push_back(makeFace(Vertex(rtn), Vertex(ltn), Vertex(lbn), block, false));
+	}
 
 	// far face
-	_buffer.push_back(makeFace(Vertex(lbf), Vertex(rbf), Vertex(rtf), block, true));
-	_buffer.push_back(makeFace(Vertex(rtf), Vertex(ltf), Vertex(lbf), block, false));
+	if (f)
+	{
+		_buffer.push_back(makeFace(Vertex(lbf), Vertex(rbf), Vertex(rtf), block, true));
+		_buffer.push_back(makeFace(Vertex(rtf), Vertex(ltf), Vertex(lbf), block, false));
+	}
 
 	// left face
-	_buffer.push_back(makeFace(Vertex(lbn), Vertex(ltn), Vertex(ltf), block, true));
-	_buffer.push_back(makeFace(Vertex(ltf), Vertex(lbf), Vertex(lbn), block, false));
+	if (l)
+	{
+		_buffer.push_back(makeFace(Vertex(lbn), Vertex(ltn), Vertex(ltf), block, true));
+		_buffer.push_back(makeFace(Vertex(ltf), Vertex(lbf), Vertex(lbn), block, false));
+	}
 
 	// right face
-	_buffer.push_back(makeFace(Vertex(rbn), Vertex(rtn), Vertex(rtf), block, true));
-	_buffer.push_back(makeFace(Vertex(rtf), Vertex(rbf), Vertex(rbn), block, false));
+	if (r)
+	{
+		_buffer.push_back(makeFace(Vertex(rbn), Vertex(rtn), Vertex(rtf), block, true));
+		_buffer.push_back(makeFace(Vertex(rtf), Vertex(rbf), Vertex(rbn), block, false));
+	}
 
 	// top face
-	_buffer.push_back(makeFace(Vertex(ltn), Vertex(ltf), Vertex(rtf), block, true));
-	_buffer.push_back(makeFace(Vertex(rtf), Vertex(rtn), Vertex(ltn), block, false));
+	if (t)
+	{
+		_buffer.push_back(makeFace(Vertex(ltn), Vertex(ltf), Vertex(rtf), block, true));
+		_buffer.push_back(makeFace(Vertex(rtf), Vertex(rtn), Vertex(ltn), block, false));
+	}
 
 	// bottom face
-	_buffer.push_back(makeFace(Vertex(lbn), Vertex(lbf), Vertex(rbf), block, true));
-	_buffer.push_back(makeFace(Vertex(rbf), Vertex(rbn), Vertex(lbn), block, false));
+	if (b)
+	{
+		_buffer.push_back(makeFace(Vertex(lbn), Vertex(lbf), Vertex(rbf), block, true));
+		_buffer.push_back(makeFace(Vertex(rbf), Vertex(rbn), Vertex(lbn), block, false));
+	}
 }
 
 Chunk::Triangle Chunk::makeFace(Vertex& v1, Vertex& v2, Vertex& v3, Block block, bool firstHalf)
@@ -202,28 +241,6 @@ Chunk::Triangle Chunk::makeFace(Vertex& v1, Vertex& v2, Vertex& v3, Block block,
 	return Triangle(v1, v2, v3);
 }
 
-bool Chunk::isSurrounded(Block& block)
-{
-	int x = block.x;
-	int y = block.y;
-	int z = block.z;
-
-	if ((x - 1 > 0 && x + 1 < _size) && (x - 1 > 0 && x + 1 < _size) && (y - 1 > 0 && y + 1 < _size) && (z - 1 > 0 && z + 1 < _size))
-	{
-		// get the adjacent blocks
-
-		Block& l = getBlock(x - 1, y, z);
-		Block& r = getBlock(x + 1, y, z);
-		Block& t = getBlock(x, y + 1, z);
-		Block& b = getBlock(x, y - 1, z);
-		Block& n = getBlock(x, y, z - 1);
-		Block& f = getBlock(x, y, z + 1);
-
-		return l.t && r.t && t.t && b.t && n.t && f.t;
-	}
-
-	return false;
-}
 
 bool Chunk::isSetup(void) const
 {
