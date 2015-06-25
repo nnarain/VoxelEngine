@@ -40,9 +40,9 @@ sgl::Vector2 Window::getMousePosition()
 	double x, y;
 	glfwGetCursorPos(_window, &x, &y);
 
-	float invY = (float)(-1) * (y - (float)_height);
+	float invY = (float)(-1) * ((float)y - (float)_height);
 
-	return sgl::Vector2(x, y);
+	return sgl::Vector2((float)x, (float)y);
 }
 
 void Window::setMousePosition(float x, float y)
