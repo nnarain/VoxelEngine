@@ -59,13 +59,15 @@ void ChunkManager::updateVisiblityList(sgl::Frustum& frustum)
 
 	for (i = x - 1; i <= x + 1; ++i)
 	{
+		if (i == _size || i < 0) continue;
+
 		for (j = y - 1; j <= y + 1; ++j)
 		{
+			if (j == _size || j < 0) continue;
+
 			for (k = z - 1; k <= z + 1; ++k)
 			{
-				if (i < 0) i = 0;
-				if (j < 0) j = 0;
-				if (k < 0) k = 0;
+				if (k == _size || k < 0) continue;
 
 				Chunk& chunk = getChunk(i, j, k);
 
@@ -108,10 +110,16 @@ void ChunkManager::fillFrustumVolume(float volume, ChunkSet& chunks)
 
 		for (i = x - 1; i <= x + 1; ++i)
 		{
+			if (i == _size || i < 0) continue;
+
 			for (j = y - 1; j <= y + 1; ++j)
 			{
+				if (j == _size || j < 0) continue;
+
 				for (k = z - 1; k <= z + 1; ++k)
 				{
+					if (k == _size || k < 0) continue;
+
 					if (i < 0) i = 0;
 					if (j < 0) j = 0;
 					if (k < 0) k = 0;
