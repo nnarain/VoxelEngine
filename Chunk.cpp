@@ -296,6 +296,11 @@ void Chunk::setAtlasName(const std::string& name)
 	_atlasName = name;
 }
 
+AABB& Chunk::getAABB()
+{
+	return aabb;
+}
+
 Chunk::~Chunk()
 {
 

@@ -39,6 +39,8 @@ namespace engine
 
 		void setAtlasName(const std::string& name);
 
+		sgl::AABB& getAABB();
+
 	private:
 		//
 		struct Triangle
