@@ -7,7 +7,6 @@
 
 #include <cstdint>
 
-
 struct Vertex
 {
 	Vertex(sgl::Vector3& pos) : position(pos)
