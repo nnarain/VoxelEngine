@@ -105,8 +105,6 @@ namespace engine
 
 		void rebuildChunks();
 
-		void fillFrustumVolume(float volume, ChunkSet& adjacent);
-
 		void allocateChunks(int chunkSize, float blockSize);
 
 	};
