@@ -5,6 +5,7 @@
 #include "Block.h"
 
 #include <SGL/GL/Mesh.h>
+#include <SGL/Math/AABB.h>
 
 #include <vector>
 #include <string>
@@ -69,6 +70,8 @@ namespace engine
 		bool _shouldRender;
 
 		bool _hasLocation;
+
+		sgl::AABB aabb;
 
 		void createCubeMesh(Block& block, bool l, bool r, bool t, bool b, bool n, bool far);
 

@@ -29,7 +29,7 @@ void ChunkManager::update(FPSCamera& camera)
 	rebuildChunks();
 }
 
-void ChunkManager::updateVisiblityList(sgl::Frustum& frustum)
+void ChunkManager::updateVisiblityList(Frustum& frustum)
 {
 	// clear the current chunks
 	_chunkRenderSet.clear();

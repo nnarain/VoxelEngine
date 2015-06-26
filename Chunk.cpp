@@ -263,6 +263,26 @@ void Chunk::setLocation(int x, int y, int z)
 	_offset.y = (float)y;
 	_offset.z = (float)z;
 
+	// calculate this chunks AABB
+
+	float maxBlockOffset = (_size - 1);
+
+	// lbn vertex for block 0, 0, 0
+	Vector3 min;
+	min.x = (0 * 2 * _blockSize + x) - _blockSize;
+	min.y = (0 * 2 * _blockSize + y) - _blockSize;
+	min.z = (0 * 2 * _blockSize + z) - _blockSize;
+
+	// rtf vertex for block 15, 15, 15
+	Vector3 max;
+	max.x = (maxBlockOffset * 2 * _blockSize + x) + _blockSize;
+	max.y = (maxBlockOffset * 2 * _blockSize + y) + _blockSize;
+	max.z = (maxBlockOffset * 2 * _blockSize + z) + _blockSize;
+
+	aabb = AABB(min, max);
+
+	// TODO : multiple min and max by transformation matrix
+
 	_hasLocation = true;
 }
 
