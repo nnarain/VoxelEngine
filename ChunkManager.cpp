@@ -34,101 +34,22 @@ void ChunkManager::updateVisiblityList(Frustum& frustum)
 	// clear the current chunks
 	_chunkRenderSet.clear();
 
-	//
-	Vector3& nearCenter = frustum.getPoint(Frustum::PointId::NC);
-	Vector3& farCenter  = frustum.getPoint(Frustum::PointId::FC);
-
-	Vector3 center = (farCenter + nearCenter) / 2.0f;
-
-	Chunk& chunk = getChunkFromWorldPosition(center);
-
-	if (chunk.isSetup())
-		_chunkRenderSet.insert(&chunk);
-	else
-		_chunkRebuildSet.insert(&chunk);
-
-	//
-	Vector3 loc = chunk.getLocation();
-	int x = (int)loc.x;
-	int y = (int)loc.y;
-	int z = (int)loc.z;
-
-	ChunkSet adjacent;
-
 	int i, j, k;
 
-	for (i = x - 1; i <= x + 1; ++i)
+	for (i = 0; i < _size; ++i)
 	{
-		if (i == _size || i < 0) continue;
-
-		for (j = y - 1; j <= y + 1; ++j)
+		for (j = 0; j < _size; ++j)
 		{
-			if (j == _size || j < 0) continue;
-
-			for (k = z - 1; k <= z + 1; ++k)
+			for (k = 0; k < _size; ++k)
 			{
-				if (k == _size || k < 0) continue;
-
 				Chunk& chunk = getChunk(i, j, k);
 
-				adjacent.insert(&chunk);
-				_chunkVisibleSet.insert(&chunk);
+				AABB& aabb = chunk.getAABB();
 
-				if (chunk.isSetup())
+				Frustum::Side side = frustum.checkBox(aabb);
+
+				if (side == Frustum::Side::INSIDE || side == Frustum::Side::INTERSECT)
 				{
-					_chunkRenderSet.insert(&chunk);
-				}
-				else
-				{
-					_chunkRebuildSet.insert(&chunk);
-				}
-			}
-		}
-	}
-
-	float frustumVolume = frustum.getVolume();
-	fillFrustumVolume(frustumVolume, adjacent);
-}
-
-void ChunkManager::fillFrustumVolume(float volume, ChunkSet& chunks)
-{
-	ChunkSet adjacent;
-
-	ChunkSet::iterator iter;
-	for (iter = chunks.begin(); iter != chunks.end(); ++iter)
-	{
-		Chunk& chunk = *(*iter);
-
-		Vector3 loc = chunk.getLocation();
-		int x = (int)loc.x;
-		int y = (int)loc.y;
-		int z = (int)loc.z;
-
-		// get the adjacent chunks
-
-		int i, j, k;
-
-		for (i = x - 1; i <= x + 1; ++i)
-		{
-			if (i == _size || i < 0) continue;
-
-			for (j = y - 1; j <= y + 1; ++j)
-			{
-				if (j == _size || j < 0) continue;
-
-				for (k = z - 1; k <= z + 1; ++k)
-				{
-					if (k == _size || k < 0) continue;
-
-					if (i < 0) i = 0;
-					if (j < 0) j = 0;
-					if (k < 0) k = 0;
-
-					Chunk& chunk = getChunk(i, j, k);
-
-					adjacent.insert(&chunk);
-					_chunkVisibleSet.insert(&chunk);
-
 					if (chunk.isSetup())
 					{
 						_chunkRenderSet.insert(&chunk);
@@ -139,21 +60,6 @@ void ChunkManager::fillFrustumVolume(float volume, ChunkSet& chunks)
 					}
 				}
 			}
-		}
-	}
-
-	if (_chunkVisibleSet.size() >= _chunks.size())
-	{
-		return;
-	}
-	else
-	{
-		float renderSize = (float)(_blocksPerChunk * _blockSize * 2);
-		float chunkVolume = _chunkVisibleSet.size() * (float)(renderSize * renderSize * renderSize);
-
-		if (chunkVolume < volume)
-		{
-			fillFrustumVolume(volume, adjacent);
 		}
 	}
 }
@@ -318,18 +224,6 @@ std::string ChunkManager::getAtlasName()
 	return _atlasName;
 }
 
-void initChunk(Chunk* chunk)
-{
-	int i, k;
-	for (i = 0; i < 16; ++i)
-	{
-		for (k = 0; k < 16; ++k)
-		{
-			chunk->setBlock(i, 0, k, 1);
-		}
-	}
-}
-
 void ChunkManager::allocateChunks(int chunkSize, float blockSize)
 {
 	int xSize = _blockX / chunkSize;
@@ -340,8 +234,6 @@ void ChunkManager::allocateChunks(int chunkSize, float blockSize)
 	if (ySize >= xSize && ySize >= zSize) _size = ySize;
 	if (zSize >= ySize && zSize >= xSize) _size = zSize;
 
-	_size = 9;
-
 	int chunksToAllocate = _size * _size * _size;
 
 	int i;
@@ -350,7 +242,6 @@ void ChunkManager::allocateChunks(int chunkSize, float blockSize)
 		Chunk* chunk = new Chunk(chunkSize, blockSize);
 		chunk->setAtlasName(_atlasName);
 
-//		initChunk(chunk);
 		_chunks.push_back(chunk);
 	}
 }
