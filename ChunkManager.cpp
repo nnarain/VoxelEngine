@@ -78,7 +78,6 @@ void ChunkManager::render()
 	}
 }
 
-
 Block ChunkManager::getBlockFromWorldPosition(const sgl::Vector3& p)
 {
 	return getBlockFromWorldPosition(p.x, p.y, p.z);

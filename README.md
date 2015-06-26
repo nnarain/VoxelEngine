@@ -22,4 +22,11 @@ CmakeList.txt will be added soon.
 
 
 
+TODO
+----
+
+- Voxel lighting
+- Block selection
+
+
 	
