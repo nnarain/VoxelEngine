@@ -2,6 +2,8 @@
 #ifndef SCRIPTENGINE_H
 #define SCRIPTENGINE_H
 
+#include "Logger.h"
+
 #include <lua.hpp>
 #include <luabind/luabind.hpp>
 #include <luabind/operator.hpp>
@@ -61,6 +63,7 @@ namespace engine
 
 			lua_State* _state;
 
+			util::Logger _logger;
 			ErrorCallback _errorCallback;
 
 			/* Private Functions */

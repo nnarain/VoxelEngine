@@ -13,7 +13,7 @@
 using namespace engine;
 using namespace engine::script;
 
-ScriptEngine::ScriptEngine() : _errorCallback(nullptr)
+ScriptEngine::ScriptEngine() : _logger("engine.log"), _errorCallback(nullptr)
 {
 	_state = luaL_newstate();
 }
@@ -142,6 +142,7 @@ void ScriptEngine::run(char *scriptName)
 		if (_errorCallback != NULL)
 		{
 			std::string error = getErrorString();
+			_logger.log(error);
 			_errorCallback(error);
 		}
 	}
