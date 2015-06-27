@@ -25,7 +25,7 @@ FPSCamera::FPSCamera(const sgl::Vector3& position) :
 {
 }
 
-void FPSCamera::update(float delta)
+void FPSCamera::update()
 {
 	// update the player directions
 	calculateView();
@@ -33,7 +33,6 @@ void FPSCamera::update(float delta)
 	// update the player projection
 
 	float ratio = Context::getScreenAspectRatio();
-
 	_proj.perspective(_fov, ratio, 0.1f, 100.0f);
 
 	// update the view frustum

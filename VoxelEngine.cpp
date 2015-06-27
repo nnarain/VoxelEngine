@@ -62,7 +62,7 @@ void VoxelEngine::updateCamera(float delta)
 	_window->setMousePosition((float)_window->getWidth() / 2, (float)_window->getHeight() / 2);
 
 	_camera.updateLookDirection(mousePos.x, mousePos.y, delta);
-	_camera.update(delta);
+	_camera.update();
 
 	//
 	Vector3& currentPosition = _camera.getPosition();

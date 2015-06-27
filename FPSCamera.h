@@ -16,7 +16,7 @@ namespace engine
 		FPSCamera();
 		FPSCamera(const sgl::Vector3& position);
 
-		void update(float delta);
+		void update();
 
 		void updateLookDirection(float x, float y, float delta);
 
