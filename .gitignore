@@ -12,3 +12,7 @@ assets/
 
 # scripts
 *.lua
+
+# log files
+*.log
+*.out
