@@ -1,5 +1,6 @@
 
 #include "TextureManager.h"
+#include "FatalError.h"
 
 #include <SGL/Util/Image.h>
 #include <SGL/Util/Exception.h>
@@ -39,7 +40,7 @@ void TextureManager::addAtlas(const char *atlasPath)
 	}
 	else
 	{
-		throw std::exception(std::string("Error. pack file does not exist: " + packFilename).c_str());
+		fatalError(std::string("Error. pack file does not exist: " + packFilename));
 	}
 }
 
@@ -60,7 +61,7 @@ void TextureManager::addTexture(const char *texturePath)
 	}
 	catch (sgl::Exception& e)
 	{
-		std::cout << e.what() << std::endl;
+		fatalError(std::string(e.what()) + ": " + std::string(texturePath));
 	}
 
 	_textureMap[getNameFromPath(texturePath)] = texture;
