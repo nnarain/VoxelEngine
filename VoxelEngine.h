@@ -7,6 +7,8 @@
 #include "Window.h"
 #include "Renderer.h"
 
+#include <SGL/Util/DebugRenderer.h>
+
 #include <set>
 
 namespace engine
@@ -33,6 +35,7 @@ namespace engine
 		gui::Window* getWindow();
 
 		Renderer& getRenderer();
+		sgl::DebugRenderer& getDebugRenderer();
 
 		/**
 			Return the instance of the voxel engine
@@ -53,16 +56,16 @@ namespace engine
 
 		//
 		Renderer* _renderer;
+		sgl::DebugRenderer* _debugRenderer;
 
 		//
 		FPSCamera _camera;
 
-		/* private functions */
+	private:
 
 		void updateChunkManagers(FPSCamera& camera);
 
 		void initializeContext();
-
 	};
 }
 

@@ -1,6 +1,8 @@
 
 #include "ChunkManager.h"
 
+#include "VoxelEngine.h"
+
 using namespace engine;
 using namespace sgl;
 
@@ -15,7 +17,8 @@ ChunkManager::ChunkManager(int x, int y, int z, int blocksPerChunk, float blockS
 	_blocksPerChunk(blocksPerChunk),
 	_blockSize(blockSize),
 	_rebuildsPerFrame(5),
-	_atlasName(atlasName)
+	_atlasName(atlasName),
+	_renderDebug(false)
 {
 	allocateChunks(blocksPerChunk, blockSize);
 
@@ -221,6 +224,11 @@ void ChunkManager::setAtlasName(const std::string& name)
 std::string ChunkManager::getAtlasName()
 {
 	return _atlasName;
+}
+
+void ChunkManager::setRenderDebug(bool d)
+{
+	_renderDebug = d;
 }
 
 void ChunkManager::allocateChunks(int chunkSize, float blockSize)

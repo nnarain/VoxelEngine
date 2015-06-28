@@ -3,6 +3,7 @@
 
 #include <SGL/SGL.h>
 #include <SGL/Util/Context.h>
+#include <SGL/Util/PerspectiveCamera.h>
 
 #include <glfw/glfw3.h>
 
@@ -12,7 +13,7 @@
 using namespace engine;
 using namespace sgl;
 
-VoxelEngine::VoxelEngine() : _camera(Vector3(10, 45, 10)), _window(nullptr), _renderer(nullptr)
+VoxelEngine::VoxelEngine() : _camera(Vector3(10, 45, 10)), _window(nullptr), _renderer(nullptr), _debugRenderer(nullptr)
 {
 }
 
@@ -103,6 +104,9 @@ void VoxelEngine::initializeContext()
 
 	_renderer = new Renderer();
 	_renderer->init();
+
+	_debugRenderer = new DebugRenderer();
+	_debugRenderer->init();
 }
 
 void VoxelEngine::loadTexture(const char *textureName)
@@ -118,6 +122,11 @@ void VoxelEngine::loadAtlas(const char *atlasName)
 Renderer& VoxelEngine::getRenderer()
 {
 	return *_renderer;
+}
+
+sgl::DebugRenderer& VoxelEngine::getDebugRenderer()
+{
+	return *_debugRenderer;
 }
 
 gui::Window* VoxelEngine::getWindow()
@@ -138,8 +147,9 @@ VoxelEngine* VoxelEngine::getEngine()
 
 VoxelEngine::~VoxelEngine()
 {
-	if (_window != nullptr)   delete _window;
-	if (_renderer != nullptr) delete _renderer;
+	if (_window != nullptr)        delete _window;
+	if (_renderer != nullptr)      delete _renderer;
+	if (_debugRenderer != nullptr) delete _debugRenderer;
 }
 
 

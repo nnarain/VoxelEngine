@@ -78,19 +78,22 @@ namespace engine
 		void setAtlasName(const std::string& name);
 		std::string getAtlasName();
 
+		void setRenderDebug(bool d);
+
 	private:
 
-		int _blockX;      // number of block in the x direction
-		int _blockY;      // number of block in the y direction
-		int _blockZ;      // number of block in the z direction
+		int _blockX;           // number of block in the x direction
+		int _blockY;           // number of block in the y direction
+		int _blockZ;           // number of block in the z direction
 
-		int   _blocksPerChunk;   // number of blocks in one dimesnsion of the chunk
-		float _blockSize; // half size of block
-
+		int   _blocksPerChunk; // number of blocks in one dimesnsion of the chunk
+		float _blockSize;      // half size of block
 
 		int _size;
 
 		int _rebuildsPerFrame;
+
+		bool _renderDebug;
 
 		sgl::Matrix4 _modelMatrix;
 
@@ -101,6 +104,8 @@ namespace engine
 		ChunkSet  _chunkVisibleSet;
 		ChunkSet  _chunkRebuildSet;
 
+
+	private:
 		Chunk& getChunk(int x, int y, int z);
 
 		void rebuildChunks();
