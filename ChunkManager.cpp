@@ -88,11 +88,11 @@ Block ChunkManager::getBlockFromWorldPosition(const sgl::Vector3& p)
 
 Block ChunkManager::getBlockFromWorldPosition(float x, float y, float z)
 {
-	int blockRenderSize = _blockSize * 2;
+	float blockRenderSize = _blockSize * 2;
 
-	int blockX = (int)x / blockRenderSize;
-	int blockY = (int)y / blockRenderSize;
-	int blockZ = (int)z / blockRenderSize;
+	int blockX = (int)(x / blockRenderSize);
+	int blockY = (int)(y / blockRenderSize);
+	int blockZ = (int)(z / blockRenderSize);
 
 	return getBlock(blockX, blockY, blockZ);
 }

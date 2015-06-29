@@ -270,7 +270,7 @@ void Chunk::setLocation(int x, int y, int z)
 	float Y = _offset.y * (_size * _blockSize * 2);
 	float Z = _offset.z * (_size * _blockSize * 2);
 
-	float maxBlockOffset = (_size - 1);
+	float maxBlockOffset = (float)(_size - 1);
 
 	// lbn vertex for block 0, 0, 0
 	Vector3 min;
