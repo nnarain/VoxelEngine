@@ -18,7 +18,8 @@ namespace engine
 	public:
 
 		~VoxelEngine();
-
+		
+		void update();
 		void render();
 
 		void addChunkManager(ChunkManager* manager);
@@ -63,7 +64,7 @@ namespace engine
 
 	private:
 
-		void updateChunkManagers(FPSCamera& camera);
+		void updateChunkManagersVisibility(sgl::Frustum& frustum);
 
 		void initializeContext();
 	};

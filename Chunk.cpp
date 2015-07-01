@@ -3,6 +3,8 @@
 
 #include "VoxelEngine.h"
 
+#include <SGL/Math/Vector4.h>
+
 #include <iostream>
 
 using namespace engine;
@@ -263,31 +265,6 @@ void Chunk::setLocation(int x, int y, int z)
 	_offset.y = (float)y;
 	_offset.z = (float)z;
 
-	// calculate this chunks AABB
-
-	// the main offset for the chunk
-	float X = _offset.x * (_size * _blockSize * 2);
-	float Y = _offset.y * (_size * _blockSize * 2);
-	float Z = _offset.z * (_size * _blockSize * 2);
-
-	float maxBlockOffset = (float)(_size - 1);
-
-	// lbn vertex for block 0, 0, 0
-	Vector3 min;
-	min.x = (0 * 2 * _blockSize + X) - _blockSize;
-	min.y = (0 * 2 * _blockSize + Y) - _blockSize;
-	min.z = (0 * 2 * _blockSize + Y) - _blockSize;
-
-	// rtf vertex for block 15, 15, 15
-	Vector3 max;
-	max.x = (maxBlockOffset * 2 * _blockSize + X) + _blockSize;
-	max.y = (maxBlockOffset * 2 * _blockSize + Y) + _blockSize;
-	max.z = (maxBlockOffset * 2 * _blockSize + Z) + _blockSize;
-
-	aabb = AABB(min, max);
-
-	// TODO : multiple min and max by transformation matrix
-
 	_hasLocation = true;
 }
 
@@ -301,9 +278,40 @@ void Chunk::setAtlasName(const std::string& name)
 	_atlasName = name;
 }
 
+void Chunk::calculateAABB(Matrix4& worldTransform)
+{
+	// calculate this chunks AABB
+
+	// the main offset for the chunk
+	float X = _offset.x * (_size * _blockSize * 2);
+	float Y = _offset.y * (_size * _blockSize * 2);
+	float Z = _offset.z * (_size * _blockSize * 2);
+
+	float maxBlockOffset = (float)(_size - 1);
+
+	// lbn vertex for block 0, 0, 0
+	Vector4 lbn;
+	lbn.x = (0 * 2 * _blockSize + X) - _blockSize;
+	lbn.y = (0 * 2 * _blockSize + Y) - _blockSize;
+	lbn.z = (0 * 2 * _blockSize + Y) - _blockSize;
+	lbn.w = 1;
+
+	// rtf vertex for block 15, 15, 15
+	Vector4 rtf;
+	rtf.x = (maxBlockOffset * 2 * _blockSize + X) + _blockSize;
+	rtf.y = (maxBlockOffset * 2 * _blockSize + Y) + _blockSize;
+	rtf.z = (maxBlockOffset * 2 * _blockSize + Z) + _blockSize;
+	rtf.w = 1;
+
+	Vector4 min = worldTransform * lbn;
+	Vector4 max = worldTransform * rtf;
+
+	_aabb = AABB(Vector3(min.x, min.y, min.z), Vector3(max.x, max.y, max.z));
+}
+
 AABB& Chunk::getAABB()
 {
-	return aabb;
+	return _aabb;
 }
 
 Chunk::~Chunk()

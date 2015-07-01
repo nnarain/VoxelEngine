@@ -38,9 +38,13 @@ namespace engine
 		/**
 			Update which chunks should be rendered using a camera frustum
 		*/
-		void update(FPSCamera& camera);
+		void update();
 
 		void updateVisiblityList(sgl::Frustum& frustum);
+
+		void translate(float x, float y, float z);
+		void rotate(float x, float y, float z);
+		void scale(float s);
 
 		/**
 			render visible chunks
@@ -73,14 +77,21 @@ namespace engine
 		int getBlockY() const;
 		int getBlockZ() const;
 
-		sgl::Matrix4& getModelMatrix();
+		sgl::Matrix4& getWorldTransform();
 
 		void setAtlasName(const std::string& name);
 		std::string getAtlasName();
 
 		void setRenderDebug(bool d);
 
+		bool boundingVolumeOutOfDate();
+
 	private:
+
+		ChunkList _chunks;
+		ChunkSet  _chunkRenderSet;
+		ChunkSet  _chunkVisibleSet;
+		ChunkSet  _chunkRebuildSet;
 
 		int _blockX;           // number of block in the x direction
 		int _blockY;           // number of block in the y direction
@@ -95,20 +106,18 @@ namespace engine
 
 		bool _renderDebug;
 
-		sgl::Matrix4 _modelMatrix;
+		sgl::Matrix4 _worldTransform;
 
 		std::string _atlasName;
 
-		ChunkList _chunks;
-		ChunkSet  _chunkRenderSet;
-		ChunkSet  _chunkVisibleSet;
-		ChunkSet  _chunkRebuildSet;
-
+		bool _updateBoundingVolume;
 
 	private:
 		Chunk& getChunk(int x, int y, int z);
 
 		void rebuildChunks();
+
+		void updateChunkVolumes();
 
 		void allocateChunks(int chunkSize, float blockSize);
 

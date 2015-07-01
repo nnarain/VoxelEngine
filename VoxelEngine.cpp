@@ -17,14 +17,24 @@ VoxelEngine::VoxelEngine() : _camera(Vector3(10, 45, 10)), _window(nullptr), _re
 {
 }
 
-void VoxelEngine::render()
+void VoxelEngine::update()
 {
 	if (_updateChunks)
 	{
-		updateChunkManagers(_camera);
+		updateChunkManagersVisibility(_camera.getFrustum());
 		_updateChunks = false;
 	}
 
+	std::set<ChunkManager*>::iterator iter;
+	for (iter = _chunkManagers.begin(); iter != _chunkManagers.end(); ++iter)
+	{
+		ChunkManager* manager = (*iter);
+		manager->update();
+	}
+}
+
+void VoxelEngine::render()
+{
 	Matrix4 VP = _camera.getProjection() * _camera.getView();
 
 	_renderer->begin();
@@ -44,13 +54,13 @@ void VoxelEngine::addChunkManager(ChunkManager* manager)
 	_chunkManagers.insert(manager);
 }
 
-void VoxelEngine::updateChunkManagers(FPSCamera& camera)
+void VoxelEngine::updateChunkManagersVisibility(Frustum& frustum)
 {
 	std::set<ChunkManager*>::iterator iter;
 	for (iter = _chunkManagers.begin(); iter != _chunkManagers.end(); ++iter)
 	{
 		ChunkManager* manager = *iter;
-		manager->update(camera);
+		manager->updateVisiblityList(frustum);
 	}
 }
 

@@ -18,16 +18,21 @@ ChunkManager::ChunkManager(int x, int y, int z, int blocksPerChunk, float blockS
 	_blockSize(blockSize),
 	_rebuildsPerFrame(5),
 	_atlasName(atlasName),
-	_renderDebug(false)
+	_renderDebug(false),
+	_updateBoundingVolume(true)
 {
 	allocateChunks(blocksPerChunk, blockSize);
 
-	_modelMatrix.toTranslation(0, 0, 0);
+	_worldTransform.toTranslation(0, 0, 0);
 }
 
-void ChunkManager::update(FPSCamera& camera)
+void ChunkManager::update()
 {
-	updateVisiblityList(camera.getFrustum());
+	if (_updateBoundingVolume)
+	{
+		updateChunkVolumes();
+		_updateBoundingVolume = false;
+	}
 
 	rebuildChunks();
 }
@@ -67,6 +72,24 @@ void ChunkManager::updateVisiblityList(Frustum& frustum)
 	}
 }
 
+void ChunkManager::translate(float x, float y, float z)
+{
+	_worldTransform.translate(x, y, z);
+	_updateBoundingVolume = true;
+}
+
+void ChunkManager::rotate(float x, float y, float z)
+{
+	_worldTransform.rotate(x, y, z);
+	_updateBoundingVolume = true;
+}
+
+void ChunkManager::scale(float s)
+{
+	_worldTransform.scale(s);
+	_updateBoundingVolume = true;
+}
+
 void ChunkManager::render()
 {
 	ChunkSet::iterator iter;
@@ -79,6 +102,20 @@ void ChunkManager::render()
 			chunk->render();
 		}
 	}
+}
+
+void ChunkManager::updateChunkVolumes()
+{
+	int i, j, k;
+	for (i = 0; i < _size; ++i)
+		for (j = 0; j < _size; ++j)
+			for (k = 0; k < _size; ++k)
+			{
+				Chunk& chunk = getChunk(i, j, k);
+				chunk.calculateAABB(_worldTransform);
+			}
+
+	_updateBoundingVolume = false;
 }
 
 Block ChunkManager::getBlockFromWorldPosition(const sgl::Vector3& p)
@@ -157,6 +194,7 @@ Chunk& ChunkManager::getChunk(int x, int y, int z)
 	if (!chunk.hasLocation())
 	{
 		chunk.setLocation(x, y, z);
+		chunk.calculateAABB(_worldTransform);
 	}
 
 	return chunk;
@@ -211,9 +249,9 @@ int ChunkManager::getBlockZ() const
 	return _blockZ;
 }
 
-sgl::Matrix4& ChunkManager::getModelMatrix()
+sgl::Matrix4& ChunkManager::getWorldTransform()
 {
-	return _modelMatrix;
+	return _worldTransform;
 }
 
 void ChunkManager::setAtlasName(const std::string& name)
@@ -229,6 +267,11 @@ std::string ChunkManager::getAtlasName()
 void ChunkManager::setRenderDebug(bool d)
 {
 	_renderDebug = d;
+}
+
+bool ChunkManager::boundingVolumeOutOfDate()
+{
+	return _updateBoundingVolume;
 }
 
 void ChunkManager::allocateChunks(int chunkSize, float blockSize)
