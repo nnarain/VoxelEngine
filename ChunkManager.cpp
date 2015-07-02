@@ -3,6 +3,8 @@
 
 #include "VoxelEngine.h"
 
+#include <iostream>
+
 using namespace engine;
 using namespace sgl;
 
@@ -67,9 +69,16 @@ void ChunkManager::updateVisiblityList(Frustum& frustum)
 						_chunkRebuildSet.insert(&chunk);
 					}
 				}
+				else
+				{
+				//	std::cout << "Failed AABB test" << std::endl;
+				//	std::cout << "\t(" << i << ", " << j << ", " << k << ")" << std::endl;
+				}
 			}
 		}
 	}
+
+//	std::cout << "-----" << std::endl;
 }
 
 void ChunkManager::translate(float x, float y, float z)
@@ -92,6 +101,9 @@ void ChunkManager::scale(float s)
 
 void ChunkManager::render()
 {
+	int size = _chunkRenderSet.size();
+	int i = 0;
+
 	ChunkSet::iterator iter;
 	for (iter = _chunkRenderSet.begin(); iter != _chunkRenderSet.end(); ++iter)
 	{

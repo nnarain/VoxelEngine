@@ -293,7 +293,7 @@ void Chunk::calculateAABB(Matrix4& worldTransform)
 	Vector4 lbn;
 	lbn.x = (0 * 2 * _blockSize + X) - _blockSize;
 	lbn.y = (0 * 2 * _blockSize + Y) - _blockSize;
-	lbn.z = (0 * 2 * _blockSize + Y) - _blockSize;
+	lbn.z = (0 * 2 * _blockSize + Z) - _blockSize;
 	lbn.w = 1;
 
 	// rtf vertex for block 15, 15, 15
