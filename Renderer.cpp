@@ -53,7 +53,7 @@ void Renderer::begin()
 
 void Renderer::render(ChunkManager& chunkManager, Matrix4& VP)
 {
-	Matrix4& M = chunkManager.getModelMatrix();
+	Matrix4& M = chunkManager.getWorldTransform();
 	Matrix4 MVP = VP * M;
 
 	_chunkShader["MVP"].set(MVP);

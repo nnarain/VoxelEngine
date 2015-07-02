@@ -33,6 +33,7 @@ void ScriptEngine::init()
 			.scope[
 				def("getEngine", &VoxelEngine::getEngine)
 			]
+			.def("update",           &VoxelEngine::update)
 			.def("render",           &VoxelEngine::render)
 			.def("createWindow",     &VoxelEngine::createWindow)
 			.def("getWindow",        &VoxelEngine::getWindow)
@@ -57,7 +58,10 @@ void ScriptEngine::init()
 			.def("getBlockX",      &ChunkManager::getBlockX)
 			.def("getBlockY",      &ChunkManager::getBlockY)
 			.def("getBlockZ",      &ChunkManager::getBlockZ)
-			.def("setRenderDebug", &ChunkManager::setRenderDebug),
+			.def("setRenderDebug", &ChunkManager::setRenderDebug)
+			.def("translate",      &ChunkManager::translate)
+			.def("rotate",         &ChunkManager::rotate)
+			.def("scale",          &ChunkManager::scale),
 
 		class_<FPSCamera>("Camera")
 			.def_readwrite("position",  &FPSCamera::position)
