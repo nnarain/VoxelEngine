@@ -13,7 +13,7 @@
 using namespace engine;
 using namespace sgl;
 
-VoxelEngine::VoxelEngine() : _camera(Vector3(10, 45, 10)), _window(nullptr), _renderer(nullptr), _debugRenderer(nullptr)
+VoxelEngine::VoxelEngine() : _camera(Vector3(10, 45, 10))
 {
 }
 
@@ -93,10 +93,8 @@ void VoxelEngine::updateCamera(float delta)
 
 void VoxelEngine::createWindow(const char * title, int width, int height)
 {
-	assert(_window == nullptr);
-
 	// create the window
-	_window = new gui::Window(title, width, height);
+	_window = std::make_unique<gui::Window>(title, width, height);
 	
 	// tell SGL the window dimensions
 	Context::setViewPortDimension((float)width, (float)height);
@@ -107,15 +105,13 @@ void VoxelEngine::createWindow(const char * title, int width, int height)
 
 void VoxelEngine::initializeContext()
 {
-	assert(_window != nullptr);
-
 	glfwMakeContextCurrent(_window->getWindow());
 	sgl::init();
 
-	_renderer = new Renderer();
+	_renderer = std::make_unique<Renderer>();
 	_renderer->init();
 
-	_debugRenderer = new DebugRenderer();
+	_debugRenderer = std::make_unique<DebugRenderer>();
 	_debugRenderer->init();
 }
 
@@ -131,17 +127,17 @@ void VoxelEngine::loadAtlas(const char *atlasName)
 
 Renderer& VoxelEngine::getRenderer()
 {
-	return *_renderer;
+	return *(_renderer.get());
 }
 
 sgl::DebugRenderer& VoxelEngine::getDebugRenderer()
 {
-	return *_debugRenderer;
+	return *(_debugRenderer.get());
 }
 
 gui::Window* VoxelEngine::getWindow()
 {
-	return _window;
+	return _window.get();
 }
 
 FPSCamera* VoxelEngine::getCamera()
@@ -157,9 +153,6 @@ VoxelEngine* VoxelEngine::getEngine()
 
 VoxelEngine::~VoxelEngine()
 {
-	if (_window != nullptr)        delete _window;
-	if (_renderer != nullptr)      delete _renderer;
-	if (_debugRenderer != nullptr) delete _debugRenderer;
 }
 
 

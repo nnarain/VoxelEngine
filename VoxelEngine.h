@@ -10,6 +10,7 @@
 #include <SGL/Util/DebugRenderer.h>
 
 #include <set>
+#include <memory>
 
 namespace engine
 {
@@ -53,11 +54,11 @@ namespace engine
 		bool _updateChunks;
 
 		//
-		gui::Window* _window;
+		std::unique_ptr<gui::Window> _window;
 
 		//
-		Renderer* _renderer;
-		sgl::DebugRenderer* _debugRenderer;
+		std::unique_ptr<Renderer> _renderer;
+		std::unique_ptr<sgl::DebugRenderer> _debugRenderer;
 
 		//
 		FPSCamera _camera;
