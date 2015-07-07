@@ -54,9 +54,9 @@ void ChunkManager::updateVisiblityList(Frustum& frustum)
 			{
 				Chunk& chunk = getChunk(i, j, k);
 
-				AABB& aabb = chunk.getAABB();
+				Sphere& bounds = chunk.getBounds();
 
-				Frustum::Side side = frustum.checkBox(aabb);
+				Frustum::Side side = frustum.checkSphere(bounds);
 
 				if (side == Frustum::Side::INSIDE || side == Frustum::Side::INTERSECT)
 				{
@@ -69,16 +69,9 @@ void ChunkManager::updateVisiblityList(Frustum& frustum)
 						_chunkRebuildSet.insert(&chunk);
 					}
 				}
-				else
-				{
-				//	std::cout << "Failed AABB test" << std::endl;
-				//	std::cout << "\t(" << i << ", " << j << ", " << k << ")" << std::endl;
-				}
 			}
 		}
 	}
-
-//	std::cout << "-----" << std::endl;
 }
 
 void ChunkManager::translate(float x, float y, float z)
@@ -101,9 +94,6 @@ void ChunkManager::scale(float s)
 
 void ChunkManager::render()
 {
-	int size = _chunkRenderSet.size();
-	int i = 0;
-
 	ChunkSet::iterator iter;
 	for (iter = _chunkRenderSet.begin(); iter != _chunkRenderSet.end(); ++iter)
 	{
@@ -124,7 +114,7 @@ void ChunkManager::updateChunkVolumes()
 			for (k = 0; k < _size; ++k)
 			{
 				Chunk& chunk = getChunk(i, j, k);
-				chunk.calculateAABB(_worldTransform);
+				chunk.calculateBounds(_worldTransform);
 			}
 
 	_updateBoundingVolume = false;
@@ -206,7 +196,7 @@ Chunk& ChunkManager::getChunk(int x, int y, int z)
 	if (!chunk.hasLocation())
 	{
 		chunk.setLocation(x, y, z);
-		chunk.calculateAABB(_worldTransform);
+		chunk.calculateBounds(_worldTransform);
 	}
 
 	return chunk;

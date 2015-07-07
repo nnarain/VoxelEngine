@@ -23,10 +23,11 @@ Chunk::Chunk(int size, float blockSize) :
 	_shouldRender(false),
 	_hasLocation(false)
 {
+	// allocate blocks and flags
 	_blocks.resize(size * size * size);
 	_hasLocationFlags.resize(size * size * size, false);
 
-	//
+	// setup mesh
 	_mesh.addAttribute(VertexAttribute(0, 3));
 	_mesh.addAttribute(VertexAttribute(1, 3));
 	_mesh.addAttribute(VertexAttribute(2, 2));
@@ -278,7 +279,7 @@ void Chunk::setAtlasName(const std::string& name)
 	_atlasName = name;
 }
 
-void Chunk::calculateAABB(Matrix4& worldTransform)
+void Chunk::calculateBounds(Matrix4& worldTransform)
 {
 	// calculate this chunks AABB
 
@@ -306,12 +307,14 @@ void Chunk::calculateAABB(Matrix4& worldTransform)
 	Vector4 min = worldTransform * lbn;
 	Vector4 max = worldTransform * rtf;
 
-	_aabb = AABB(Vector3(min.x, min.y, min.z), Vector3(max.x, max.y, max.z));
+	Vector4 center = (max + min) / 2.0f;
+	_bounds.center = Vector3(center.x, center.y, center.z);
+	_bounds.radius = (Vector3(max.x, max.y, max.z) - _bounds.center).length();
 }
 
-AABB& Chunk::getAABB()
+Sphere& Chunk::getBounds()
 {
-	return _aabb;
+	return _bounds;
 }
 
 Chunk::~Chunk()

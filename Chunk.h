@@ -5,7 +5,7 @@
 #include "Block.h"
 
 #include <SGL/GL/Mesh.h>
-#include <SGL/Math/AABB.h>
+#include <SGL/Math/Sphere.h>
 #include <SGL/Math/Matrix4.h>
 
 #include <vector>
@@ -40,8 +40,9 @@ namespace engine
 
 		void setAtlasName(const std::string& name);
 
-		void calculateAABB(sgl::Matrix4& worldTransform);
-		sgl::AABB& getAABB();
+		void calculateBounds(sgl::Matrix4& worldTransform);
+
+		sgl::Sphere& getBounds();
 
 	private:
 		//
@@ -75,7 +76,7 @@ namespace engine
 
 		bool _hasLocation;
 
-		sgl::AABB _aabb;
+		sgl::Sphere _bounds;
 
 		void createCubeMesh(Block& block, bool l, bool r, bool t, bool b, bool n, bool far);
 
