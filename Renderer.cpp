@@ -23,9 +23,9 @@ void Renderer::init()
 	{
 		_chunkShader.load(ShaderProgram::Type::VERTEX,   GLSL_VERTEX_NORMAL_TEXTURE_VERT);
 		_chunkShader.load(ShaderProgram::Type::FRAGMENT, GLSL_VERTEX_NORMAL_TEXTURE_FRAG);
-		_chunkShader.addAttribute("vPosition", 3);
-		_chunkShader.addAttribute("vNormal",   3);
-		_chunkShader.addAttribute("vTexCoord", 2);
+		_chunkShader.addAttribute("vPosition");
+		_chunkShader.addAttribute("vNormal");
+		_chunkShader.addAttribute("vTexCoord");
 
 		_chunkShader.link();
 	}
