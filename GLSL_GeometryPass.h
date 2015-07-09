@@ -17,14 +17,13 @@ namespace sgl
 		out vec2 fTexCoord;
 
 		uniform mat4 MVP;
-		uniform mat4 M;
 		uniform mat3 N;
 
 		void main()
 		{
 			gl_Position = MVP * vec4(vPosition, 1);
 
-			fNormal = N * vNormal;
+			fNormal   = N * vNormal;
 			fTexCoord = vTexCoord;
 		}
 	);
@@ -37,12 +36,12 @@ namespace sgl
 		in vec3 fNormal;
 		in vec2 fTexCoord;
 
-		uniform sampler2D sampler;
+		uniform sampler2D blockTexture;
 
 		void main()
 		{
-			outNormal = normalize(fNormal);
-			outDiffuse = texture(sampler, fTexCoord).xyz;
+			outNormal  = normalize(fNormal);
+			outDiffuse = texture(blockTexture, fTexCoord).xyz;
 		}
 	);
 }

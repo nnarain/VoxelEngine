@@ -5,8 +5,11 @@
 #include "ChunkManager.h"
 #include "TextureManager.h"
 
+#include "GBuffer.h"
+
 #include <SGL/GL/ShaderProgram.h>
 #include <SGL/GL/Texture.h>
+#include <SGL/GL/Mesh.h>
 
 #include <SGL/Math/Matrix4.h>
 
@@ -30,9 +33,18 @@ namespace engine
 		TextureManager& getTextureManager();
 
 	private:
-		sgl::ShaderProgram _chunkShader;
+		sgl::ShaderProgram _geometryPass;
+		sgl::ShaderProgram _lightPass;
 
-		TextureManager _textureManager;
+		GBuffer            _gBuffer;
+
+		sgl::Mesh          _screenMesh;
+
+		TextureManager     _textureManager;
+
+	private:
+
+		void initScreenMesh(sgl::Mesh& mesh);
 
 	};
 }
