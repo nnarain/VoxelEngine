@@ -127,7 +127,7 @@ void Chunk::build()
 
 	if (_buffer.size() > 0)
 	{
-		vbo.setData(&_buffer[0], _buffer.size() * sizeof(Chunk::Triangle));
+		vbo.setData(&_buffer[0], _buffer.size() * sizeof(Chunk::Face));
 	}
 	else
 	{
@@ -206,7 +206,7 @@ void Chunk::createCubeMesh(Block& block, bool l, bool r, bool t, bool b, bool n,
 	}
 }
 
-Chunk::Triangle Chunk::makeFace(Vertex& v1, Vertex& v2, Vertex& v3, Block block, bool firstHalf)
+Chunk::Face Chunk::makeFace(Vertex& v1, Vertex& v2, Vertex& v3, Block block, bool firstHalf)
 {
 	// calculate the normal of the triangle
 
@@ -241,7 +241,7 @@ Chunk::Triangle Chunk::makeFace(Vertex& v1, Vertex& v2, Vertex& v3, Block block,
 	}
 
 	//
-	return Triangle(v1, v2, v3);
+	return Face(v1, v2, v3);
 }
 
 

@@ -46,20 +46,22 @@ namespace engine
 
 	private:
 		//
-		struct Triangle
+		struct Face
 		{
-			Triangle(Vertex& v1, Vertex& v2, Vertex& v3) : v1(v1), v2(v2), v3(v3)
+			Face(Vertex& v1, Vertex& v2, Vertex& v3) : v1(v1), v2(v2), v3(v3)
 			{
 			}
 
 			Vertex v1;
 			Vertex v2;
 			Vertex v3;
+
+			sgl::Vector3 normal;
 		};
 
 		sgl::Mesh _mesh;
 
-		std::vector<Triangle> _buffer;
+		std::vector<Face> _buffer;
 
 		sgl::Vector3 _offset;
 
@@ -80,7 +82,7 @@ namespace engine
 
 		void createCubeMesh(Block& block, bool l, bool r, bool t, bool b, bool n, bool far);
 
-		Triangle makeFace(Vertex& v1, Vertex& v2, Vertex& v3, Block block, bool firstHalf);
+		Face makeFace(Vertex& v1, Vertex& v2, Vertex& v3, Block block, bool firstHalf);
 	};
 }
 
