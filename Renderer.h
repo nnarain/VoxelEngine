@@ -2,6 +2,8 @@
 #ifndef RENDERER_H
 #define RENDERER_H
 
+#include "IRenderer.h"
+
 #include "ChunkManager.h"
 #include "TextureManager.h"
 
@@ -17,7 +19,7 @@ namespace engine
 {
 	/**
 	*/
-	class Renderer
+	class Renderer : public IRenderer
 	{
 	public:
 
@@ -30,8 +32,6 @@ namespace engine
 		void render(ChunkManager& chunkManager, sgl::Matrix4& VP);
 		void end();
 
-		TextureManager& getTextureManager();
-
 	private:
 		sgl::ShaderProgram _geometryPass;
 		sgl::ShaderProgram _lightPass;
@@ -39,8 +39,6 @@ namespace engine
 		GBuffer            _gBuffer;
 
 		sgl::Mesh          _screenMesh;
-
-		TextureManager     _textureManager;
 
 	private:
 

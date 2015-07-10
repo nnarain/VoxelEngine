@@ -154,11 +154,6 @@ void Renderer::end()
 	_lightPass.end();
 }
 
-TextureManager& Renderer::getTextureManager()
-{
-	return _textureManager;
-}
-
 Renderer::~Renderer()
 {
 }
