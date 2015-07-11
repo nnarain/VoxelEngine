@@ -55,8 +55,6 @@ namespace engine
 			Vertex v1;
 			Vertex v2;
 			Vertex v3;
-
-			sgl::Vector3 normal;
 		};
 
 		sgl::Mesh _mesh;

@@ -39,14 +39,19 @@ namespace sgl
 
 			vec3 diffuseColor = diffuse;
 
-			float diffuseFactor = dot(normal, -vec3(1, 1, 1));
+			float diffuseFactor = dot(normal, -vec3(-1, -1, -1));
 
 			if (diffuseFactor > 0)
 			{
 				diffuseColor *= vec3(1, 1, 1) * vec3(1, 1, 1) * 1 * diffuseFactor;	
+				fragColor = diffuseColor;
+			}
+			else
+			{
+				fragColor = vec3(1, 0, 0);
 			}
 
-			fragColor = diffuseColor;
+			
 		}
 
 		vec2 calcTexCoord()
