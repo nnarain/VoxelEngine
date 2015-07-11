@@ -34,24 +34,24 @@ namespace sgl
 		{
 			vec2 texCoord = calcTexCoord();
 
-			vec3 normal  = texture(normalMap,  texCoord).xyz;
-			vec3 diffuse = texture(diffuseMap, texCoord).xyz;
+			vec3 normal   = texture(normalMap,  texCoord).xyz;
+			vec3 texColor = texture(diffuseMap, texCoord).xyz;
 
-			vec3 diffuseColor = diffuse;
+			// ambient light
+			vec3 ambientColor = vec3(1, 1, 1) * 0.3;
+
+			// diffuse color
+
+			vec3 diffuseColor = vec3(0, 0, 0);
 
 			float diffuseFactor = dot(normal, -vec3(-1, -1, -1));
 
 			if (diffuseFactor > 0)
 			{
-				diffuseColor *= vec3(1, 1, 1) * vec3(1, 1, 1) * 1 * diffuseFactor;	
-				fragColor = diffuseColor;
-			}
-			else
-			{
-				fragColor = vec3(1, 0, 0);
+				diffuseColor = vec3(1, 1, 1) * 0.5 * diffuseFactor;
 			}
 
-			
+			fragColor = texColor * (ambientColor + diffuseColor);
 		}
 
 		vec2 calcTexCoord()
