@@ -4,6 +4,7 @@
 
 
 Debug/
+assets/
 
 *.o
 *.obj
@@ -11,3 +12,7 @@ Debug/
 
 # scripts
 *.lua
+
+# log files
+*.log
+*.out

@@ -2,8 +2,11 @@
 #ifndef SCRIPTENGINE_H
 #define SCRIPTENGINE_H
 
+#include "Logger.h"
+
 #include <lua.hpp>
 #include <luabind/luabind.hpp>
+#include <luabind/operator.hpp>
 
 #include <string>
 
@@ -16,7 +19,7 @@ namespace engine
 		public:
 
 			// Error Callback
-			typedef void(*ErrorCallback)(const char *);
+			typedef void(*ErrorCallback)(const std::string& what);
 
 			ScriptEngine();
 			~ScriptEngine();
@@ -60,6 +63,7 @@ namespace engine
 
 			lua_State* _state;
 
+			util::Logger _logger;
 			ErrorCallback _errorCallback;
 
 			/* Private Functions */

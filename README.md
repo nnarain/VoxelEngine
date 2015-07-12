@@ -14,5 +14,18 @@ Dependencies
 - luabind
 	- lua 5.2
 	- Boost C++
+	
+Building
+--------
+
+CmakeList.txt will be added soon.
+
+
+TODO
+----
+
+- Voxel lighting
+- Block selection
+
 
 	

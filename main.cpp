@@ -1,18 +1,24 @@
 
+#include "VoxelEngine.h"
 #include "ScriptEngine.h"
 #include "Window.h"
 
+#include <SGL/SGL.h>
+#include <SGL/Util/Exception.h>
+
 #include <iostream>
+#include <string>
 
 #define VERSION "1.0"
+
+#define ENABLE_SCRIPTING
 
 using namespace engine;
 using namespace engine::script;
 
 /* Prototypes */
 
-static void scriptError(const char *what);
-static void initUserInput(ScriptEngine* scriptEngine);
+static void scriptError(const std::string &what);
 
 static void registerUICallbacks(gui::Window* window);
 
@@ -23,7 +29,6 @@ static void onMouseMove(GLFWwindow*, double x, double y);
 
 /* Globals */
 
-static GLFWwindow* g_Window;
 static ScriptEngine* g_ScriptEngine;
 
 int main(int argc, char *argv[])
@@ -35,10 +40,22 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 
-	// script to run
+	// init GLFW
+	if (!glfwInit())
+	{
+		std::cout << "failed to initialize GLFW" << std::endl;
+		return -1;
+	}
+
+	glfwWindowHint(GLFW_OPENGL_PROFILE, 0);
+
+	//
+
+	//
+#ifdef ENABLE_SCRIPTING
 	char *scriptName = argv[1];
 
-	// Scripting Engine
+	// Initialize the scripting engine
 	ScriptEngine scriptEngine;
 	scriptEngine.init();
 	scriptEngine.setErrorCallback(scriptError);
@@ -49,16 +66,20 @@ int main(int argc, char *argv[])
 
 	// run the script
 	scriptEngine.run(scriptName);
+#endif
+
+	// terminate glfw
+	glfwTerminate();
 
 	return 0;
 }
 
 void registerUICallbacks(gui::Window* window)
 {
-	g_Window = window->getWindow();
+	GLFWwindow* gWindow = window->getWindow();
 
-	glfwSetKeyCallback(g_Window, onKeyEvent);
-	glfwSetCursorPosCallback(g_Window, onMouseMove);
+	glfwSetKeyCallback(gWindow, onKeyEvent);
+	glfwSetCursorPosCallback(gWindow, onMouseMove);
 }
 
 void onKeyEvent(GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -73,7 +94,7 @@ void onMouseMove(GLFWwindow* window, double x, double y)
 	g_ScriptEngine->callFunction("onMouseMove", x, y);
 }
 
-void scriptError(const char *what)
+void scriptError(const std::string& what)
 {
 	std::cout << what << std::endl;
 }
