@@ -21,7 +21,14 @@ Chunk::Chunk(int size, float blockSize) :
 	_blockSize(blockSize),
 	_dirty(true),
 	_shouldRender(false),
-	_hasLocation(false)
+	_hasLocation(false),
+
+	left(nullptr),
+	right(nullptr),
+	top(nullptr),
+	bottom(nullptr),
+	near(nullptr),
+	far(nullptr)
 {
 	// allocate blocks and flags
 	_blocks.resize(size * size * size);

@@ -44,6 +44,15 @@ namespace engine
 
 		sgl::Sphere& getBounds();
 
+	public:
+
+		Chunk* left;
+		Chunk* right;
+		Chunk* top;
+		Chunk* bottom;
+		Chunk* near;
+		Chunk* far;
+
 	private:
 		//
 		struct Face

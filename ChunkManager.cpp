@@ -197,6 +197,7 @@ Chunk& ChunkManager::getChunk(int x, int y, int z)
 	{
 		chunk.setLocation(x, y, z);
 		chunk.calculateBounds(_worldTransform);
+		setChunkNeighbors(chunk);
 	}
 
 	return chunk;
@@ -296,6 +297,27 @@ void ChunkManager::allocateChunks(int chunkSize, float blockSize)
 
 		_chunks.push_back(chunk);
 	}
+}
+
+void ChunkManager::setChunkNeighbors(Chunk& chunk)
+{
+	Vector3 loc = chunk.getLocation();
+	int x = (int)loc.x;
+	int y = (int)loc.y;
+	int z = (int)loc.z;
+
+	if (x - 1 > 0)
+		chunk.left   = &getChunk(x - 1, y, z);
+	if (x + 1 < _size)
+		chunk.right  = &getChunk(x + 1, y, z);
+	if (y + 1 < _size)
+		chunk.top    = &getChunk(x, y + 1, z);
+	if (y - 1 > 0)
+		chunk.bottom = &getChunk(x, y - 1, z);
+	if (z - 1 > 0)
+		chunk.near   = &getChunk(x, y, z - 1);
+	if (z + 1 < _size)
+		chunk.far    = &getChunk(x, y, z + 1);
 }
 
 ChunkManager::~ChunkManager()

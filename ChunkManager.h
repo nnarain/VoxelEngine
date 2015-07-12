@@ -120,6 +120,7 @@ namespace engine
 		void updateChunkVolumes();
 
 		void allocateChunks(int chunkSize, float blockSize);
+		void setChunkNeighbors(Chunk& chunk);
 
 	};
 }
