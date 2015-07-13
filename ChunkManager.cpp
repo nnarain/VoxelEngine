@@ -168,7 +168,7 @@ Block ChunkManager::getBlock(int x, int y, int z)
 
 	Chunk& chunk = getChunk(chunkX, chunkY, chunkZ);
 
-	return chunk.getBlock(blockX, blockY, blockZ);
+	return *chunk.getBlock(blockX, blockY, blockZ);
 }
 
 void ChunkManager::setBlock(int x, int y, int z, int t)
@@ -306,15 +306,15 @@ void ChunkManager::setChunkNeighbors(Chunk& chunk)
 	int y = (int)loc.y;
 	int z = (int)loc.z;
 
-	if (x - 1 > 0)
+	if (x - 1 >= 0)
 		chunk.left   = &getChunk(x - 1, y, z);
 	if (x + 1 < _size)
 		chunk.right  = &getChunk(x + 1, y, z);
 	if (y + 1 < _size)
 		chunk.top    = &getChunk(x, y + 1, z);
-	if (y - 1 > 0)
+	if (y - 1 >= 0)
 		chunk.bottom = &getChunk(x, y - 1, z);
-	if (z - 1 > 0)
+	if (z - 1 >= 0)
 		chunk.near   = &getChunk(x, y, z - 1);
 	if (z + 1 < _size)
 		chunk.far    = &getChunk(x, y, z + 1);

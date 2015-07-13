@@ -44,30 +44,77 @@ Chunk::Chunk(int size, float blockSize) :
 
 void Chunk::setBlock(int x, int y, int z, int t)
 {
-	Block& block = getBlock(x, y, z);
-	block.t = t;
+	Block* block = getBlock(x, y, z);
+	block->t = t;
 
 	_dirty = true;
 }
 
-Block& Chunk::getBlock(int x, int y, int z)
+Block* Chunk::getBlock(int x, int y, int z)
 {
-	if (x < 0) x = 0;
-	if (y < 0) y = 0;
-	if (z < 0) z = 0;
-
 	int idx = (x * _size) + (y * _size * _size) + z;
 
-	Block& block = _blocks[idx];
+	Block* block = &_blocks[idx];
 
 	if (!_hasLocationFlags[idx])
 	{
-		block.x = x;
-		block.y = y;
-		block.z = z;
+		block->x = x;
+		block->y = y;
+		block->z = z;
 	}
 
 	return block;
+}
+
+Block* Chunk::getAdjacentBlock(int x, int y, int z)
+{
+	if (x < 0)
+	{
+		if (this->left != nullptr)
+			return this->left->getAdjacentBlock(_size + x, y, z);
+		else
+			return nullptr;
+	}
+	else if (x >= _size)
+	{
+		if (this->right != nullptr)
+			return this->right->getAdjacentBlock(x - _size, y, z);
+		else
+			return nullptr;
+	}
+
+	if (y < 0)
+	{
+		if (this->bottom != nullptr)
+			return this->bottom->getAdjacentBlock(x, _size + y, z);
+		else
+			return nullptr;
+	}
+	else if (y >= _size)
+	{
+		if (this->top != nullptr)
+			return this->top->getAdjacentBlock(x, y - _size, z);
+		else
+			return nullptr;
+	}
+
+	if (z < 0)
+	{
+		if (this->near != nullptr)
+			return this->near->getAdjacentBlock(x, y, _size + z);
+		else
+			return nullptr;
+
+	}
+	else if (z >= _size)
+	{
+		if (this->far != nullptr)
+			return this->far->getAdjacentBlock(x, y, z - _size);
+		else
+			return nullptr;
+	}
+
+	return getBlock(x, y, z);
 }
 
 void Chunk::render()
@@ -94,33 +141,35 @@ void Chunk::build()
 		{
 			for (z = 0; z < _size; ++z)
 			{
-				Block& block = getBlock(x, y, z);
+				Block* block = getBlock(x, y, z);
 
 				// add this block if it is active
-				if (block.t)
+				if (block->t)
 				{
 					// check if the adjacent blocks are active, if so don't create the joining face in the mesh
-					bool l = true, r = true, t = true, b = true, n = true, f = true;
+					bool l, r, t, b, n, f;
 
-					if ((int)block.x - 1 >= 0 && block.x + 1 < _size)
-						l = getBlock(block.x - 1, block.y, block.z).t == 0;
+					Block* adjacentBlock;
 
-					if ((int)block.x - 1 >= 0 && block.x + 1 < _size)
-						r = getBlock(block.x + 1, block.y, block.z).t == 0;
+					adjacentBlock = getAdjacentBlock(block->x - 1, block->y, block->z);
+					l = (adjacentBlock == nullptr || adjacentBlock->t == 0);
 
-					if ((int)block.y - 1 >= 0 && block.y + 1 < _size)
-						t = getBlock(block.x, block.y + 1, block.z).t == 0;
+					adjacentBlock = getAdjacentBlock(block->x + 1, block->y, block->z);
+					r = (adjacentBlock == nullptr || adjacentBlock->t == 0);
 
-					if ((int)block.y - 1 >= 0 && block.y + 1 < _size)
-						b = getBlock(block.x, block.y - 1, block.z).t == 0;
+					adjacentBlock = getAdjacentBlock(block->x, block->y + 1, block->z);
+					t = (adjacentBlock == nullptr || adjacentBlock->t == 0);
 
-					if ((int)block.z - 1 >= 0 && block.z + 1 < _size)
-						n = getBlock(block.x, block.y, block.z -1).t == 0;
+					adjacentBlock = getAdjacentBlock(block->x, block->y - 1, block->z);
+					b = (adjacentBlock == nullptr || adjacentBlock->t == 0);
 
-					if ((int)block.z - 1 >= 0 && block.z + 1< _size)
-						f = getBlock(block.x, block.y, block.z + 1).t == 0;
+					adjacentBlock = getAdjacentBlock(block->x, block->y, block->z - 1);
+					n = (adjacentBlock == nullptr || adjacentBlock->t == 0);
 
-					createCubeMesh(block, l, r, t, b, n, f);
+					adjacentBlock = getAdjacentBlock(block->x, block->y, block->z + 1);
+					f = (adjacentBlock == nullptr || adjacentBlock->t == 0);
+
+					createCubeMesh(*block, l, r, t, b, n, f);
 					_shouldRender = true;
 				}
 			}
