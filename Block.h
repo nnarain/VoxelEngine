@@ -9,7 +9,11 @@
 
 struct Vertex
 {
-	Vertex(sgl::Vector3& pos) : position(pos)
+	Vertex(sgl::Vector3& pos, sgl::Vector3& n) : position(pos), normal(n)
+	{
+	}
+
+	Vertex(sgl::Vector3& pos) : Vertex(pos, sgl::Vector3(0, 0, 0))
 	{
 	}
 

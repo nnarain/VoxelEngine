@@ -219,46 +219,60 @@ void Chunk::createCubeMesh(Block& block, bool l, bool r, bool t, bool b, bool n,
 	Vector3 ltf((x * 2 * _blockSize + X) - _blockSize, (y * 2 * _blockSize + Y) + _blockSize, (z * 2 * _blockSize + Z) + _blockSize);
 	Vector3 rtf((x * 2 * _blockSize + X) + _blockSize, (y * 2 * _blockSize + Y) + _blockSize, (z * 2 * _blockSize + Z) + _blockSize);
 
+	Vector3 ux(1, 0, 0);
+	Vector3 uy(0, 1, 0);
+	Vector3 uz(0, 0, 1);
+
+	Vertex vLBN(lbn, calculatePerVertexNormal(-ux, -uy, -uz, l, b, n));
+	Vertex vRBN(rbn, calculatePerVertexNormal( ux, -uy, -uz, r, b, n));
+	Vertex vLTN(ltn, calculatePerVertexNormal(-ux,  uy, -uz, l, t, n));
+	Vertex vRTN(rtn, calculatePerVertexNormal( ux,  uy, -uz, r, t, n));
+
+	Vertex vLBF(lbf, calculatePerVertexNormal(-ux, -uy, uz, l, b, f));
+	Vertex vRBF(rbf, calculatePerVertexNormal( ux, -uy, uz, r, b, f));
+	Vertex vLTF(ltf, calculatePerVertexNormal(-ux,  uy, uz, l, t, f));
+	Vertex vRTF(rtf, calculatePerVertexNormal( ux,  uy, uz, r, t, f));
+
 	// near face
 	if (n)
 	{
-		_buffer.push_back(makeFace(Vertex(lbn), Vertex(rbn), Vertex(rtn), block, true));
-		_buffer.push_back(makeFace(Vertex(rtn), Vertex(ltn), Vertex(lbn), block, false));
+		_buffer.push_back(makeFace(vLBN, vRBN, vRTN, block, true));
+		_buffer.push_back(makeFace(vRTN, vLTN, vLBN, block, false));
 	}
 
 	// far face
 	if (f)
 	{
-		_buffer.push_back(makeFace(Vertex(lbf), Vertex(rbf), Vertex(rtf), block, true));
-		_buffer.push_back(makeFace(Vertex(rtf), Vertex(ltf), Vertex(lbf), block, false));
+		_buffer.push_back(makeFace(vLBF, vRBF, vRTF, block, true));
+		_buffer.push_back(makeFace(vRTF, vLTF, vLBF, block, false));
 	}
 
 	// left face
 	if (l)
 	{
-		_buffer.push_back(makeFace(Vertex(lbn), Vertex(ltn), Vertex(ltf), block, true));
-		_buffer.push_back(makeFace(Vertex(ltf), Vertex(lbf), Vertex(lbn), block, false));
+		_buffer.push_back(makeFace(vLBN, vLTN, vLTF, block, true));
+		_buffer.push_back(makeFace(vLTF, vLBF, vLBN, block, false));
 	}
 
 	// right face
 	if (r)
 	{
-		_buffer.push_back(makeFace(Vertex(rbn), Vertex(rtn), Vertex(rtf), block, true));
-		_buffer.push_back(makeFace(Vertex(rtf), Vertex(rbf), Vertex(rbn), block, false));
+		_buffer.push_back(makeFace(vRBN, vRTN, vRTF, block, true));
+		_buffer.push_back(makeFace(vRTF, vRBF, vRBN, block, false));
 	}
 
 	// top face
 	if (t)
 	{
-		_buffer.push_back(makeFace(Vertex(ltn), Vertex(ltf), Vertex(rtf), block, true));
-		_buffer.push_back(makeFace(Vertex(rtf), Vertex(rtn), Vertex(ltn), block, false));
+		_buffer.push_back(makeFace(vLTN, vLTF, vRTF, block, true));
+		_buffer.push_back(makeFace(vRTF, vRTN, vLTN, block, false));
 	}
 
 	// bottom face
 	if (b)
 	{
-		_buffer.push_back(makeFace(Vertex(lbn), Vertex(lbf), Vertex(rbf), block, true));
-		_buffer.push_back(makeFace(Vertex(rbf), Vertex(rbn), Vertex(lbn), block, false));
+		_buffer.push_back(makeFace(vLBN, vLBF, vRBF, block, true));
+		_buffer.push_back(makeFace(vRBF, vRBN, vLBN, block, false));
 	}
 }
 
@@ -274,22 +288,11 @@ Vector3 Chunk::calculatePerVertexNormal(Vector3 x, Vector3 y, Vector3 z, bool ad
 
 Chunk::Face Chunk::makeFace(Vertex& v1, Vertex& v2, Vertex& v3, Block block, bool firstHalf)
 {
-	// calculate the normal of the triangle
+	return textureFace(v1, v2, v3, block, firstHalf);
+}
 
-	// calculate 2 edge vectors of the triangle
-	Vector3 u = v2.position - v1.position;
-	Vector3 v = v3.position - v1.position;
-
-	// the perpendicular vector to the edges is the normal
-
-	// normal
-	Vector3 n;
-	n.set(u).cross(v).normalize();
-
-	v1.normal.set(n);
-	v2.normal.set(n);
-	v3.normal.set(n);
-
+Chunk::Face Chunk::textureFace(Vertex& v1, Vertex& v2, Vertex& v3, Block block, bool firstHalf)
+{
 	// set vertex texture coordinates
 	Texture::TextureRegion region = VoxelEngine::getEngine()->getRenderer().getTextureManager().getAtlas(_atlasName).getRegion(block);
 
@@ -306,10 +309,8 @@ Chunk::Face Chunk::makeFace(Vertex& v1, Vertex& v2, Vertex& v3, Block block, boo
 		v3.texCoord = region.topLeft;
 	}
 
-	//
 	return Face(v1, v2, v3);
 }
-
 
 bool Chunk::isSetup(void) const
 {
