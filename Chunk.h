@@ -91,6 +91,7 @@ namespace engine
 		void createCubeMesh(Block& block, bool l, bool r, bool t, bool b, bool n, bool far);
 
 		Face makeFace(Vertex& v1, Vertex& v2, Vertex& v3, Block block, bool firstHalf);
+		sgl::Vector3 calculatePerVertexNormal(sgl::Vector3 x, sgl::Vector3 y, sgl::Vector3 z, bool adjacentX, bool adjacentY, bool adjacentZ);
 	};
 }
 

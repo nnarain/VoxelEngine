@@ -262,6 +262,16 @@ void Chunk::createCubeMesh(Block& block, bool l, bool r, bool t, bool b, bool n,
 	}
 }
 
+Vector3 Chunk::calculatePerVertexNormal(Vector3 x, Vector3 y, Vector3 z, bool adjacentX, bool adjacentY, bool adjacentZ)
+{
+	Vector3 result;
+	if (adjacentX) result += x;
+	if (adjacentY) result += y;
+	if (adjacentZ) result += z;
+
+	return result.normalize();
+}
+
 Chunk::Face Chunk::makeFace(Vertex& v1, Vertex& v2, Vertex& v3, Block block, bool firstHalf)
 {
 	// calculate the normal of the triangle
