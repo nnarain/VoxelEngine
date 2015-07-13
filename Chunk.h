@@ -30,6 +30,9 @@ namespace engine
 
 		void setBlock(int x, int y, int z, int t);
 
+		void setLightLevel(int x, int y, int z, int r, int g, int b, int a);
+		uint32_t getLightLevel(int x, int y, int z);
+
 		bool isSetup(void) const;
 
 		bool shouldRender(void);

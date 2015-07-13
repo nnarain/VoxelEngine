@@ -117,6 +117,21 @@ Block* Chunk::getAdjacentBlock(int x, int y, int z)
 	return getBlock(x, y, z);
 }
 
+void Chunk::setLightLevel(int x, int y, int z, int r, int g, int b, int a)
+{
+	Block* block = getBlock(x, y, z);
+
+	SET_LIGHT_LEVEL_R(block->light, r);
+	SET_LIGHT_LEVEL_G(block->light, g);
+	SET_LIGHT_LEVEL_B(block->light, b);
+	SET_LIGHT_LEVEL_A(block->light, a);
+}
+
+uint32_t Chunk::getLightLevel(int x, int y, int z)
+{
+	return getBlock(x, y, z)->light;
+}
+
 void Chunk::render()
 {
 	_mesh.bind();

@@ -11,8 +11,6 @@
 
 #define VERSION "1.0"
 
-#define ENABLE_SCRIPTING
-
 using namespace engine;
 using namespace engine::script;
 
@@ -50,9 +48,6 @@ int main(int argc, char *argv[])
 	glfwWindowHint(GLFW_OPENGL_PROFILE, 0);
 
 	//
-
-	//
-#ifdef ENABLE_SCRIPTING
 	char *scriptName = argv[1];
 
 	// Initialize the scripting engine
@@ -66,7 +61,7 @@ int main(int argc, char *argv[])
 
 	// run the script
 	scriptEngine.run(scriptName);
-#endif
+
 
 	// terminate glfw
 	glfwTerminate();

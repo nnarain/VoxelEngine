@@ -46,7 +46,7 @@ void Renderer::init()
 		_lightPass.link();
 
 		// initialize the GBuffer
-		_gBuffer.init(Context::getViewPortWidth(), Context::getViewPortHeight());
+		_gBuffer.init((int)Context::getViewPortWidth(), (int)Context::getViewPortHeight());
 
 		// init the screen mesh
 		initScreenMesh(_screenMesh);
