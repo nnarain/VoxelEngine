@@ -89,7 +89,7 @@ namespace engine
 			uint8_t x;
 			uint8_t y;
 			uint8_t z;
-			uint16_t lightLevel;
+			light_t lightLevel;
 			Chunk* owner;
 		};
 

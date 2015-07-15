@@ -29,6 +29,7 @@
 #define SET_LIGHT_LEVEL_B(light, level) (light) |= ( ( (light) & ~B_MASK ) | ((level) & CHNL_MASK) << (CHNL_BITS * 2) )
 #define SET_LIGHT_LEVEL_A(light, level) (light) |= ( ( (light) & ~A_MASK ) | ((level) & CHNL_MASK) << (CHNL_BITS * 3) )
 
+typedef uint16_t light_t;
 
 struct Vertex
 {
@@ -60,7 +61,12 @@ struct Block
 	uint8_t  x;
 	uint8_t  y;
 	uint8_t  z;
-	uint16_t light;
+	light_t light;
 };
+
+static bool isBlockOpaque(Block& block)
+{
+	return block.t != 0;
+}
 
 #endif
