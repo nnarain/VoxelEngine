@@ -508,9 +508,9 @@ ColorRGB32f Chunk::getBlockColor(Block& block)
 	uint8_t gi = GET_LIGHT_LEVEL_G(block.light);
 	uint8_t bi = GET_LIGHT_LEVEL_B(block.light);
 
-	float rf = (float)ri / 15.0f;
-	float gf = (float)gi / 15.0f;
-	float bf = (float)bi / 15.0f;
+	float rf = (float)ri / (float)CHNL_MASK;
+	float gf = (float)gi / (float)CHNL_MASK;
+	float bf = (float)bi / (float)CHNL_MASK;
 
 	return ColorRGB32f(rf, gf, bf);
 }
