@@ -34,6 +34,7 @@ void Renderer::init()
 
 		_geometryPass.bindFragOutput("outNormal");
 		_geometryPass.bindFragOutput("outDiffuse");
+		_geometryPass.bindFragOutput("outColor");
 
 		_geometryPass.link();
 
@@ -146,6 +147,7 @@ void Renderer::end()
 
 		_lightPass["normalMap"].set(_gBuffer.getNormalTexture());
 		_lightPass["diffuseMap"].set(_gBuffer.getDiffuseTexture());
+		_lightPass["colorMap"].set(_gBuffer.getColorTexture());
 
 		_screenMesh.bind();
 		_screenMesh.draw();

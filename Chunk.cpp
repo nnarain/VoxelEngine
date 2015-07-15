@@ -5,14 +5,15 @@
 
 #include <SGL/Math/Vector4.h>
 
+#include <sstream>
 #include <iostream>
+#include <queue>
 
 using namespace engine;
 using namespace sgl;
 
 Chunk::Chunk(int size) : Chunk(size, 1)
 {
-
 }
 
 Chunk::Chunk(int size, float blockSize) : 
@@ -38,6 +39,7 @@ Chunk::Chunk(int size, float blockSize) :
 	_mesh.addAttribute(VertexAttribute(0, 3));
 	_mesh.addAttribute(VertexAttribute(1, 3));
 	_mesh.addAttribute(VertexAttribute(2, 2));
+	_mesh.addAttribute(VertexAttribute(3, 3));
 
 	_mesh.create(sizeof(Vertex));
 }
@@ -117,6 +119,13 @@ Block* Chunk::getAdjacentBlock(int x, int y, int z)
 	return getBlock(x, y, z);
 }
 
+void Chunk::setLightSource(int x, int y, int z, int r, int g, int b, int a)
+{
+	setLightLevel(x, y, z, r, g, b, a);
+
+	_lightSourceList.emplace_back((uint8_t)x, (uint8_t)y, (uint8_t)z, getBlock(x, y, z)->light, this);
+}
+
 void Chunk::setLightLevel(int x, int y, int z, int r, int g, int b, int a)
 {
 	Block* block = getBlock(x, y, z);
@@ -125,6 +134,10 @@ void Chunk::setLightLevel(int x, int y, int z, int r, int g, int b, int a)
 	SET_LIGHT_LEVEL_G(block->light, g);
 	SET_LIGHT_LEVEL_B(block->light, b);
 	SET_LIGHT_LEVEL_A(block->light, a);
+
+	// notify the parent that this chunk needs to be rebuilt
+	_updateCallback(this);
+	_dirty = true;
 }
 
 uint32_t Chunk::getLightLevel(int x, int y, int z)
@@ -141,10 +154,18 @@ void Chunk::render()
 
 void Chunk::build()
 {
+	std::stringstream ss;
+	ss << "building chunk (" << _offset.x << ", " << _offset.y << ", " << _offset.z << ")";
+
+	VoxelEngine::getEngine()->getLogger().log(ss.str());
+
 	_shouldRender = false;
 
 	// clear existing data from the buffer
 	_buffer.clear();
+
+	// propagate any light sources in the chunk
+	propagateLight();
 
 	// iterate over each block and created the mesh
 
@@ -234,19 +255,21 @@ void Chunk::createCubeMesh(Block& block, bool l, bool r, bool t, bool b, bool n,
 	Vector3 ltf((x * 2 * _blockSize + X) - _blockSize, (y * 2 * _blockSize + Y) + _blockSize, (z * 2 * _blockSize + Z) + _blockSize);
 	Vector3 rtf((x * 2 * _blockSize + X) + _blockSize, (y * 2 * _blockSize + Y) + _blockSize, (z * 2 * _blockSize + Z) + _blockSize);
 
+	ColorRGB32f color = getBlockColor(block);
+
 	Vector3 ux(1, 0, 0);
 	Vector3 uy(0, 1, 0);
 	Vector3 uz(0, 0, 1);
 
-	Vertex vLBN(lbn, calculatePerVertexNormal(-ux, -uy, -uz, l, b, n));
-	Vertex vRBN(rbn, calculatePerVertexNormal( ux, -uy, -uz, r, b, n));
-	Vertex vLTN(ltn, calculatePerVertexNormal(-ux,  uy, -uz, l, t, n));
-	Vertex vRTN(rtn, calculatePerVertexNormal( ux,  uy, -uz, r, t, n));
+	Vertex vLBN(lbn, calculatePerVertexNormal(-ux, -uy, -uz, l, b, n), color);
+	Vertex vRBN(rbn, calculatePerVertexNormal( ux, -uy, -uz, r, b, n), color);
+	Vertex vLTN(ltn, calculatePerVertexNormal(-ux,  uy, -uz, l, t, n), color);
+	Vertex vRTN(rtn, calculatePerVertexNormal( ux,  uy, -uz, r, t, n), color);
 
-	Vertex vLBF(lbf, calculatePerVertexNormal(-ux, -uy, uz, l, b, f));
-	Vertex vRBF(rbf, calculatePerVertexNormal( ux, -uy, uz, r, b, f));
-	Vertex vLTF(ltf, calculatePerVertexNormal(-ux,  uy, uz, l, t, f));
-	Vertex vRTF(rtf, calculatePerVertexNormal( ux,  uy, uz, r, t, f));
+	Vertex vLBF(lbf, calculatePerVertexNormal(-ux, -uy, uz, l, b, f),  color);
+	Vertex vRBF(rbf, calculatePerVertexNormal( ux, -uy, uz, r, b, f),  color);
+	Vertex vLTF(ltf, calculatePerVertexNormal(-ux,  uy, uz, l, t, f),  color);
+	Vertex vRTF(rtf, calculatePerVertexNormal( ux,  uy, uz, r, t, f),  color);
 
 	// near face
 	if (n)
@@ -327,6 +350,177 @@ Chunk::Face Chunk::textureFace(Vertex& v1, Vertex& v2, Vertex& v3, Block block, 
 	return Face(v1, v2, v3);
 }
 
+void Chunk::propagateLight()
+{
+	std::vector<LightNode>::iterator iter;
+	for (iter = _lightSourceList.begin(); iter != _lightSourceList.end(); ++iter)
+	{
+		// breathe first searh queue of light nodes
+		std::queue<LightNode> bfsLightQueue;
+
+		bfsLightQueue.push(*iter);
+
+		while (!bfsLightQueue.empty())
+		{
+			// get the next node
+			LightNode node = bfsLightQueue.front();
+
+			// extract information
+
+			int x = (int)node.x;
+			int y = (int)node.y;
+			int z = (int)node.z;
+			
+			uint32_t lightLevel = node.lightLevel;
+
+			Chunk* owner = node.owner;
+
+			// remove node from queue
+			bfsLightQueue.pop();
+
+			//
+			LightNode adjacentNode;
+
+			adjacentNode = owner->getLightNode(x - 1, y, z);
+
+			if (adjacentNode.owner != nullptr && spreadLight(adjacentNode, lightLevel))
+				bfsLightQueue.push(adjacentNode);
+
+			adjacentNode = owner->getLightNode(x + 1, y, z);
+
+			if (adjacentNode.owner != nullptr && spreadLight(adjacentNode, lightLevel))
+				bfsLightQueue.push(adjacentNode);
+
+			adjacentNode = owner->getLightNode(x, y + 1, z);
+
+			if (adjacentNode.owner != nullptr && spreadLight(adjacentNode, lightLevel))
+				bfsLightQueue.push(adjacentNode);
+
+			adjacentNode = owner->getLightNode(x, y - 1, z);
+
+			if (adjacentNode.owner != nullptr && spreadLight(adjacentNode, lightLevel))
+				bfsLightQueue.push(adjacentNode);
+
+			adjacentNode = owner->getLightNode(x, y, z - 1);
+
+			if (adjacentNode.owner != nullptr && spreadLight(adjacentNode, lightLevel))
+				bfsLightQueue.push(adjacentNode);
+
+			adjacentNode = owner->getLightNode(x, y, z + 1);
+
+			if (adjacentNode.owner != nullptr && spreadLight(adjacentNode, lightLevel))
+				bfsLightQueue.push(adjacentNode);
+
+
+		}
+	}
+}
+
+bool Chunk::spreadLight(LightNode& node, uint32_t level)
+{
+	int r1 = GET_LIGHT_LEVEL_R(level);
+	int g1 = GET_LIGHT_LEVEL_G(level);
+	int b1 = GET_LIGHT_LEVEL_B(level);
+
+	int r2 = GET_LIGHT_LEVEL_R(node.lightLevel);
+	int g2 = GET_LIGHT_LEVEL_G(node.lightLevel);
+	int b2 = GET_LIGHT_LEVEL_B(node.lightLevel);
+
+	int newR = r2, newG = g2, newB = b2;
+
+	bool propagate = false;
+
+	if (r2 + 2 <= r1 && r1 > 0)
+	{
+		SET_LIGHT_LEVEL_R(node.lightLevel, r1 - 1);
+		newR = r1 - 1;
+		propagate = true;
+	}
+
+	if (g2 + 2 <= g1 && g1 > 0)
+	{
+		SET_LIGHT_LEVEL_G(node.lightLevel, g1 - 1);
+		newG = g1 - 1;
+		propagate = true;
+	}
+
+	if (b2 + 2 <= b2 && b1 > 0)
+	{
+		SET_LIGHT_LEVEL_B(node.lightLevel, b1 - 1);
+		newB = b1 - 1;
+		propagate = true;
+	}
+
+	node.owner->setLightLevel(node.x, node.y, node.z, newR, newG, newB, 0);
+
+	return propagate;
+}
+
+Chunk::LightNode Chunk::getLightNode(int x, int y, int z)
+{
+	if (x < 0)
+	{
+		if (this->left != nullptr)
+			return this->left->getLightNode(_size + x, y, z);
+		else
+			return LightNode(0, 0, 0, 0, nullptr);
+	}
+	else if (x >= _size)
+	{
+		if (this->right != nullptr)
+			return this->right->getLightNode(x - _size, y, z);
+		else
+			return LightNode(0, 0, 0, 0, nullptr);
+	}
+
+	if (y < 0)
+	{
+		if (this->bottom != nullptr)
+			return this->bottom->getLightNode(x, _size + y, z);
+		else
+			return LightNode(0, 0, 0, 0, nullptr);
+	}
+	else if (y >= _size)
+	{
+		if (this->top != nullptr)
+			return this->top->getLightNode(x, y - _size, z);
+		else
+			return LightNode(0, 0, 0, 0, nullptr);
+	}
+
+	if (z < 0)
+	{
+		if (this->near != nullptr)
+			return this->near->getLightNode(x, y, _size + z);
+		else
+			return LightNode(0, 0, 0, 0, nullptr);
+	}
+	else if (z >= _size)
+	{
+		if (this->far != nullptr)
+			return this->far->getLightNode(x, y, z - _size);
+		else
+			return LightNode(0, 0, 0, 0, nullptr);
+	}
+
+	Block* block = getBlock(x, y, z);
+
+	return LightNode(block->x, block->y, block->z, block->light, this);
+}
+
+ColorRGB32f Chunk::getBlockColor(Block& block)
+{
+	uint8_t ri = GET_LIGHT_LEVEL_R(block.light);
+	uint8_t gi = GET_LIGHT_LEVEL_G(block.light);
+	uint8_t bi = GET_LIGHT_LEVEL_B(block.light);
+
+	float rf = (float)ri / 15.0f;
+	float gf = (float)gi / 15.0f;
+	float bf = (float)bi / 15.0f;
+
+	return ColorRGB32f(rf, gf, bf);
+}
+
 bool Chunk::isSetup(void) const
 {
 	return _dirty == false;
@@ -397,6 +591,11 @@ void Chunk::calculateBounds(Matrix4& worldTransform)
 Sphere& Chunk::getBounds()
 {
 	return _bounds;
+}
+
+void Chunk::setUpdateCallback(std::function<void(Chunk*)> callback)
+{
+	_updateCallback = callback;
 }
 
 Chunk::~Chunk()

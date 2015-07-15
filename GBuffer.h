@@ -24,12 +24,14 @@ namespace engine
 
 		sgl::Texture& getNormalTexture();
 		sgl::Texture& getDiffuseTexture();
+		sgl::Texture& getColorTexture();
 
 	private:
 		sgl::FrameBuffer _fbo;
 
 		sgl::Texture _normalTexture;
 		sgl::Texture _diffuseTexture;
+		sgl::Texture _colorTexture;
 
 		sgl::RenderBuffer _depthBuffer;
 

@@ -13,7 +13,7 @@
 using namespace engine;
 using namespace engine::script;
 
-ScriptEngine::ScriptEngine() : _logger("engine.log"), _errorCallback(nullptr)
+ScriptEngine::ScriptEngine() : _errorCallback(nullptr)
 {
 	_state = luaL_newstate();
 }
@@ -54,6 +54,7 @@ void ScriptEngine::init()
 			.def(constructor<int, int, int, int, float, const char *>())
 			.def("getBlock",       &ChunkManager::getBlock)
 			.def("setBlock",       &ChunkManager::setBlock)
+			.def("setLightSource", &ChunkManager::setLightSource)
 			.def("setAtlasName",   &ChunkManager::setAtlasName)
 			.def("getBlockX",      &ChunkManager::getBlockX)
 			.def("getBlockY",      &ChunkManager::getBlockY)
@@ -147,7 +148,7 @@ void ScriptEngine::run(char *scriptName)
 		if (_errorCallback != NULL)
 		{
 			std::string error = getErrorString();
-			_logger.log(error);
+			VoxelEngine::getEngine()->getLogger().log(error);
 			_errorCallback(error);
 		}
 	}

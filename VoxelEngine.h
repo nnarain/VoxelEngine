@@ -6,6 +6,7 @@
 #include "FPSCamera.h"
 #include "Window.h"
 #include "Renderer.h"
+#include "Logger.h"
 
 #include <SGL/Util/DebugRenderer.h>
 
@@ -39,6 +40,8 @@ namespace engine
 		Renderer& getRenderer();
 		sgl::DebugRenderer& getDebugRenderer();
 
+		util::Logger& getLogger();
+
 		/**
 			Return the instance of the voxel engine
 		*/
@@ -62,6 +65,9 @@ namespace engine
 
 		//
 		FPSCamera _camera;
+
+		//
+		util::Logger _logger;
 
 	private:
 

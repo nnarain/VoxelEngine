@@ -8,30 +8,42 @@
 
 #include <cstdint>
 
-#define GET_LIGHT_LEVEL_R(light) ((light & ~0xFFF0))
-#define GET_LIGHT_LEVEL_G(light) ((light & ~0xFF0F) >> 4 )
-#define GET_LIGHT_LEVEL_B(light) ((light & ~0xF0FF) >> 8 )
-#define GET_LIGHT_LEVEL_A(light) ((light & ~0x0FFF) >> 12)
+#define CLR(x, y) (x &= ~y)
+#define SET(x, y) (x |= y)
 
-#define SET_LIGHT_LEVEL_R(light, level) ((light) |= ((level) & ~0xFFF0))
-#define SET_LIGHT_LEVEL_G(light, level) ((light) |= ((level) & ~0xFF0F) << 4 )
-#define SET_LIGHT_LEVEL_B(light, level) ((light) |= ((level) & ~0xF0FF) << 8 )
-#define SET_LIGHT_LEVEL_A(light, level) ((light) |= ((level) & ~0x0FFF) << 12)
+#define R_MASK 0x000F
+#define G_MASK 0x00F0
+#define B_MASK 0x0F00
+#define A_MASK 0xF000
+
+#define CHNL_MASK 0x000F
+#define CHNL_BITS 4
+
+#define GET_LIGHT_LEVEL_R(light) ((light & R_MASK))
+#define GET_LIGHT_LEVEL_G(light) ((light & G_MASK) >> CHNL_BITS )
+#define GET_LIGHT_LEVEL_B(light) ((light & B_MASK) >> (CHNL_BITS * 2) )
+#define GET_LIGHT_LEVEL_A(light) ((light & A_MASK) >> (CHNL_BITS * 3) )
+
+#define SET_LIGHT_LEVEL_R(light, level) (light) |= ( ( (light) & ~R_MASK ) | ((level) & CHNL_MASK) )
+#define SET_LIGHT_LEVEL_G(light, level) (light) |= ( ( (light) & ~G_MASK ) | ((level) & CHNL_MASK) << (CHNL_BITS) )
+#define SET_LIGHT_LEVEL_B(light, level) (light) |= ( ( (light) & ~B_MASK ) | ((level) & CHNL_MASK) << (CHNL_BITS * 2) )
+#define SET_LIGHT_LEVEL_A(light, level) (light) |= ( ( (light) & ~A_MASK ) | ((level) & CHNL_MASK) << (CHNL_BITS * 3) )
 
 
 struct Vertex
 {
-	Vertex(sgl::Vector3& pos, sgl::Vector3& n) : position(pos), normal(n)
+	Vertex(sgl::Vector3& pos, sgl::Vector3& n, sgl::ColorRGB32f c) : position(pos), normal(n), color(c)
 	{
 	}
 
-	Vertex(sgl::Vector3& pos) : Vertex(pos, sgl::Vector3(0, 0, 0))
+	Vertex(sgl::Vector3& pos) : Vertex(pos, sgl::Vector3(0, 0, 0), sgl::ColorRGB32f(1,1,1))
 	{
 	}
 
-	sgl::Vector3 position;
-	sgl::Vector3 normal;
-	sgl::Vector2 texCoord;
+	sgl::Vector3     position;
+	sgl::Vector3     normal;
+	sgl::Vector2     texCoord;
+	sgl::ColorRGB32f color;
 };
 
 struct Block
@@ -40,7 +52,7 @@ struct Block
 	{
 	}
 
-	Block(uint8_t t, uint8_t x, uint8_t y, uint8_t z) : t(t), x(x), y(y), z(z)
+	Block(uint8_t t, uint8_t x, uint8_t y, uint8_t z) : t(t), x(x), y(y), z(z), light(0)
 	{
 	}
 

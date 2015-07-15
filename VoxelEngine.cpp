@@ -13,7 +13,7 @@
 using namespace engine;
 using namespace sgl;
 
-VoxelEngine::VoxelEngine() : _camera(Vector3(10, 45, 10))
+VoxelEngine::VoxelEngine() : _camera(Vector3(10, 45, 10)), _logger("engine.log")
 {
 }
 
@@ -143,6 +143,11 @@ gui::Window* VoxelEngine::getWindow()
 FPSCamera* VoxelEngine::getCamera()
 {
 	return &_camera;
+}
+
+util::Logger& VoxelEngine::getLogger()
+{
+	return _logger;
 }
 
 VoxelEngine* VoxelEngine::getEngine()
