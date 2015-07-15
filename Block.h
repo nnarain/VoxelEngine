@@ -60,7 +60,7 @@ struct Block
 	uint8_t  x;
 	uint8_t  y;
 	uint8_t  z;
-	uint32_t light;
+	uint16_t light;
 };
 
 #endif
