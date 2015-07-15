@@ -36,7 +36,7 @@ namespace sgl
 			vec2 texCoord = calcTexCoord();
 
 			vec3 normal     = texture(normalMap,  texCoord).xyz;
-			vec3 texColor   = texture(diffuseMap, texCoord).xyz;
+			vec3 baseColor  = texture(diffuseMap, texCoord).xyz;
 			vec3 lightColor = texture(colorMap,   texCoord).xyz;
 
 			// ambient light
@@ -53,8 +53,8 @@ namespace sgl
 				diffuseColor = vec3(1, 1, 1) * 0.5 * diffuseFactor;
 			}
 
-			//fragColor = texColor * (ambientColor + diffuseColor);
-			fragColor = lightColor;
+			fragColor = (baseColor)* (ambientColor + diffuseColor + lightColor);
+			//fragColor = lightColor;
 		}
 
 		vec2 calcTexCoord()
