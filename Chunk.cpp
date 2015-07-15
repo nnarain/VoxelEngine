@@ -5,7 +5,6 @@
 
 #include <SGL/Math/Vector4.h>
 
-#include <sstream>
 #include <iostream>
 #include <queue>
 
@@ -154,11 +153,6 @@ void Chunk::render()
 
 void Chunk::build()
 {
-	std::stringstream ss;
-	ss << "building chunk (" << _offset.x << ", " << _offset.y << ", " << _offset.z << ")";
-
-	VoxelEngine::getEngine()->getLogger().log(ss.str());
-
 	_shouldRender = false;
 
 	// clear existing data from the buffer
@@ -444,7 +438,7 @@ bool Chunk::spreadLight(LightNode& node, uint32_t level)
 		propagate = true;
 	}
 
-	if (b2 + 2 <= b2 && b1 > 0)
+	if (b2 + 2 <= b1 && b1 > 0)
 	{
 		SET_LIGHT_LEVEL_B(node.lightLevel, b1 - 1);
 		newB = b1 - 1;
