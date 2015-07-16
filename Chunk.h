@@ -32,10 +32,7 @@ namespace engine
 
 		void setBlock(int x, int y, int z, int t);
 
-		void setLightSource(int x, int y, int z, int r, int g, int b, int a);
-		void setLightLevel(int x, int y, int z, int r, int g, int b, int a);
-		
-		uint32_t getLightLevel(int x, int y, int z);
+		void setLightSource(int x, int y, int z, int r, int g, int b);
 
 		bool isSetup(void) const;
 
@@ -78,18 +75,15 @@ namespace engine
 
 		struct LightNode
 		{
-			LightNode(uint8_t x, uint8_t y, uint8_t z, uint32_t level, Chunk* chunk) : x(x), y(y), z(z), lightLevel(level), owner(chunk)
+			LightNode(Block* block, Chunk* owner) : block(block), owner(owner)
 			{
 			}
 
-			LightNode() : LightNode(0, 0, 0, 0, nullptr)
+			LightNode() : LightNode(nullptr, nullptr)
 			{
 			}
 
-			uint8_t x;
-			uint8_t y;
-			uint8_t z;
-			light_t lightLevel;
+			Block* block;
 			Chunk* owner;
 		};
 
@@ -122,16 +116,20 @@ namespace engine
 
 		void createCubeMesh(Block& block, bool l, bool r, bool t, bool b, bool n, bool far);
 
-		Face makeFace(Vertex& v1, Vertex& v2, Vertex& v3, Block block, bool firstHalf);
+		Face makeFace(Vertex& v1, Vertex& v2, Vertex& v3, Block block, bool firstHalf, sgl::ColorRGB32f& color);
 		sgl::Vector3 calculatePerVertexNormal(sgl::Vector3 x, sgl::Vector3 y, sgl::Vector3 z, bool adjacentX, bool adjacentY, bool adjacentZ);
 		Face textureFace(Vertex& v1, Vertex& v2, Vertex& v3, Block block, bool firstHalf);
 
 		void propagateLight();
-		bool spreadLight(LightNode& node, uint32_t level);
+		bool propagateLightPerFace(LightNode& source, LightNode& block, BlockFace face);
+
+		bool spreadLight(LightNode& node, BlockFace face, light_t level);
+
+		void setLightLevel(Block* block, int r, int g, int b, BlockFace face);
 
 		LightNode getLightNode(int x, int y, int z);
 
-		sgl::ColorRGB32f getBlockColor(Block& block);
+		sgl::ColorRGB32f getBlockColor(Block& block, BlockFace face);
 	};
 }
 

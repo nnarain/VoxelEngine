@@ -50,11 +50,10 @@ namespace sgl
 
 			if (diffuseFactor > 0)
 			{
-				diffuseColor = vec3(1, 1, 1) * 0.5 * diffuseFactor;
+				diffuseColor = vec3(1, 1, 1) * 0.2 * diffuseFactor;
 			}
 
 			fragColor = (baseColor)* (ambientColor + diffuseColor + lightColor);
-			//fragColor = lightColor;
 		}
 
 		vec2 calcTexCoord()
