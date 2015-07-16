@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <queue>
+#include <memory>
 
 using namespace engine;
 using namespace sgl;
@@ -118,30 +119,31 @@ Block* Chunk::getAdjacentBlock(int x, int y, int z)
 	return getBlock(x, y, z);
 }
 
-void Chunk::setLightSource(int x, int y, int z, int r, int g, int b, int a)
-{
-	setLightLevel(x, y, z, r, g, b, a);
-
-	_lightSourceList.emplace_back((uint8_t)x, (uint8_t)y, (uint8_t)z, getBlock(x, y, z)->light, this);
-}
-
-void Chunk::setLightLevel(int x, int y, int z, int r, int g, int b, int a)
+void Chunk::setLightSource(int x, int y, int z, int r, int g, int b)
 {
 	Block* block = getBlock(x, y, z);
 
-	SET_LIGHT_LEVEL_R(block->light, r);
-	SET_LIGHT_LEVEL_G(block->light, g);
-	SET_LIGHT_LEVEL_B(block->light, b);
-	SET_LIGHT_LEVEL_A(block->light, a);
+	setLightLevel(block, r, g, b, BlockFace::LEFT);
+	setLightLevel(block, r, g, b, BlockFace::RIGHT);
+	setLightLevel(block, r, g, b, BlockFace::TOP);
+	setLightLevel(block, r, g, b, BlockFace::BOTTOM);
+	setLightLevel(block, r, g, b, BlockFace::NEAR);
+	setLightLevel(block, r, g, b, BlockFace::FAR);
+
+	_lightSourceList.emplace_back(block, this);
+}
+
+void Chunk::setLightLevel(Block* block, int r, int g, int b, BlockFace face)
+{
+	int idx = static_cast<int>(face);
+
+	SET_LIGHT_LEVEL_R(block->lights[idx], r);
+	SET_LIGHT_LEVEL_G(block->lights[idx], g);
+	SET_LIGHT_LEVEL_B(block->lights[idx], b);
 
 	// notify the parent that this chunk needs to be rebuilt
 	_updateCallback(this);
 	_dirty = true;
-}
-
-uint32_t Chunk::getLightLevel(int x, int y, int z)
-{
-	return getBlock(x, y, z)->light;
 }
 
 void Chunk::render()
@@ -249,62 +251,60 @@ void Chunk::createCubeMesh(Block& block, bool l, bool r, bool t, bool b, bool n,
 	Vector3 ltf((x * 2 * _blockSize + X) - _blockSize, (y * 2 * _blockSize + Y) + _blockSize, (z * 2 * _blockSize + Z) + _blockSize);
 	Vector3 rtf((x * 2 * _blockSize + X) + _blockSize, (y * 2 * _blockSize + Y) + _blockSize, (z * 2 * _blockSize + Z) + _blockSize);
 
-	ColorRGB32f color = getBlockColor(block);
-
 	Vector3 ux(1, 0, 0);
 	Vector3 uy(0, 1, 0);
 	Vector3 uz(0, 0, 1);
 
-	Vertex vLBN(lbn, calculatePerVertexNormal(-ux, -uy, -uz, l, b, n), color);
-	Vertex vRBN(rbn, calculatePerVertexNormal( ux, -uy, -uz, r, b, n), color);
-	Vertex vLTN(ltn, calculatePerVertexNormal(-ux,  uy, -uz, l, t, n), color);
-	Vertex vRTN(rtn, calculatePerVertexNormal( ux,  uy, -uz, r, t, n), color);
+	Vertex vLBN(lbn, calculatePerVertexNormal(-ux, -uy, -uz, l, b, n));
+	Vertex vRBN(rbn, calculatePerVertexNormal( ux, -uy, -uz, r, b, n));
+	Vertex vLTN(ltn, calculatePerVertexNormal(-ux,  uy, -uz, l, t, n));
+	Vertex vRTN(rtn, calculatePerVertexNormal( ux,  uy, -uz, r, t, n));
 
-	Vertex vLBF(lbf, calculatePerVertexNormal(-ux, -uy, uz, l, b, f),  color);
-	Vertex vRBF(rbf, calculatePerVertexNormal( ux, -uy, uz, r, b, f),  color);
-	Vertex vLTF(ltf, calculatePerVertexNormal(-ux,  uy, uz, l, t, f),  color);
-	Vertex vRTF(rtf, calculatePerVertexNormal( ux,  uy, uz, r, t, f),  color);
+	Vertex vLBF(lbf, calculatePerVertexNormal(-ux, -uy, uz, l, b, f));
+	Vertex vRBF(rbf, calculatePerVertexNormal( ux, -uy, uz, r, b, f));
+	Vertex vLTF(ltf, calculatePerVertexNormal(-ux,  uy, uz, l, t, f));
+	Vertex vRTF(rtf, calculatePerVertexNormal( ux,  uy, uz, r, t, f));
 
 	// near face
 	if (n)
 	{
-		_buffer.push_back(makeFace(vLBN, vRBN, vRTN, block, true));
-		_buffer.push_back(makeFace(vRTN, vLTN, vLBN, block, false));
+		_buffer.push_back(makeFace(vLBN, vRBN, vRTN, block, true, getBlockColor(block, BlockFace::NEAR)));
+		_buffer.push_back(makeFace(vRTN, vLTN, vLBN, block, false, getBlockColor(block, BlockFace::NEAR)));
 	}
 
 	// far face
 	if (f)
 	{
-		_buffer.push_back(makeFace(vLBF, vRBF, vRTF, block, true));
-		_buffer.push_back(makeFace(vRTF, vLTF, vLBF, block, false));
+		_buffer.push_back(makeFace(vLBF, vRBF, vRTF, block, true, getBlockColor(block, BlockFace::FAR)));
+		_buffer.push_back(makeFace(vRTF, vLTF, vLBF, block, false, getBlockColor(block, BlockFace::FAR)));
 	}
 
 	// left face
 	if (l)
 	{
-		_buffer.push_back(makeFace(vLBN, vLTN, vLTF, block, true));
-		_buffer.push_back(makeFace(vLTF, vLBF, vLBN, block, false));
+		_buffer.push_back(makeFace(vLBN, vLTN, vLTF, block, true, getBlockColor(block, BlockFace::LEFT)));
+		_buffer.push_back(makeFace(vLTF, vLBF, vLBN, block, false, getBlockColor(block, BlockFace::LEFT)));
 	}
 
 	// right face
 	if (r)
 	{
-		_buffer.push_back(makeFace(vRBN, vRTN, vRTF, block, true));
-		_buffer.push_back(makeFace(vRTF, vRBF, vRBN, block, false));
+		_buffer.push_back(makeFace(vRBN, vRTN, vRTF, block, true, getBlockColor(block, BlockFace::RIGHT)));
+		_buffer.push_back(makeFace(vRTF, vRBF, vRBN, block, false, getBlockColor(block, BlockFace::RIGHT)));
 	}
 
 	// top face
 	if (t)
 	{
-		_buffer.push_back(makeFace(vLTN, vLTF, vRTF, block, true));
-		_buffer.push_back(makeFace(vRTF, vRTN, vLTN, block, false));
+		_buffer.push_back(makeFace(vLTN, vLTF, vRTF, block, true, getBlockColor(block, BlockFace::TOP)));
+		_buffer.push_back(makeFace(vRTF, vRTN, vLTN, block, false, getBlockColor(block, BlockFace::TOP)));
 	}
 
 	// bottom face
 	if (b)
 	{
-		_buffer.push_back(makeFace(vLBN, vLBF, vRBF, block, true));
-		_buffer.push_back(makeFace(vRBF, vRBN, vLBN, block, false));
+		_buffer.push_back(makeFace(vLBN, vLBF, vRBF, block, true, getBlockColor(block, BlockFace::BOTTOM)));
+		_buffer.push_back(makeFace(vRBF, vRBN, vLBN, block, false, getBlockColor(block, BlockFace::BOTTOM)));
 	}
 }
 
@@ -318,8 +318,12 @@ Vector3 Chunk::calculatePerVertexNormal(Vector3 x, Vector3 y, Vector3 z, bool ad
 	return result.normalize();
 }
 
-Chunk::Face Chunk::makeFace(Vertex& v1, Vertex& v2, Vertex& v3, Block block, bool firstHalf)
+Chunk::Face Chunk::makeFace(Vertex& v1, Vertex& v2, Vertex& v3, Block block, bool firstHalf, ColorRGB32f& color)
 {
+	v1.color = color;
+	v2.color = color;
+	v3.color = color;
+
 	return textureFace(v1, v2, v3, block, firstHalf);
 }
 
@@ -361,11 +365,9 @@ void Chunk::propagateLight()
 
 			// extract information
 
-			int x = (int)node.x;
-			int y = (int)node.y;
-			int z = (int)node.z;
-			
-			uint32_t lightLevel = node.lightLevel;
+			int x = (int)node.block->x;
+			int y = (int)node.block->y;
+			int z = (int)node.block->z;
 
 			Chunk* owner = node.owner;
 
@@ -377,48 +379,130 @@ void Chunk::propagateLight()
 
 			adjacentNode = owner->getLightNode(x - 1, y, z);
 
-			if (adjacentNode.owner != nullptr && spreadLight(adjacentNode, lightLevel))
+			if (adjacentNode.owner != nullptr && propagateLightPerFace(node, adjacentNode, BlockFace::LEFT))
 				bfsLightQueue.push(adjacentNode);
 
 			adjacentNode = owner->getLightNode(x + 1, y, z);
 
-			if (adjacentNode.owner != nullptr && spreadLight(adjacentNode, lightLevel))
+			if (adjacentNode.owner != nullptr && propagateLightPerFace(node, adjacentNode, BlockFace::RIGHT))
 				bfsLightQueue.push(adjacentNode);
 
 			adjacentNode = owner->getLightNode(x, y + 1, z);
 
-			if (adjacentNode.owner != nullptr && spreadLight(adjacentNode, lightLevel))
+			if (adjacentNode.owner != nullptr && propagateLightPerFace(node, adjacentNode, BlockFace::TOP))
 				bfsLightQueue.push(adjacentNode);
 
 			adjacentNode = owner->getLightNode(x, y - 1, z);
 
-			if (adjacentNode.owner != nullptr && spreadLight(adjacentNode, lightLevel))
+			if (adjacentNode.owner != nullptr && propagateLightPerFace(node, adjacentNode, BlockFace::BOTTOM))
 				bfsLightQueue.push(adjacentNode);
 
 			adjacentNode = owner->getLightNode(x, y, z - 1);
 
-			if (adjacentNode.owner != nullptr && spreadLight(adjacentNode, lightLevel))
+			if (adjacentNode.owner != nullptr && propagateLightPerFace(node, adjacentNode, BlockFace::NEAR))
 				bfsLightQueue.push(adjacentNode);
 
 			adjacentNode = owner->getLightNode(x, y, z + 1);
 
-			if (adjacentNode.owner != nullptr && spreadLight(adjacentNode, lightLevel))
+			if (adjacentNode.owner != nullptr && propagateLightPerFace(node, adjacentNode, BlockFace::FAR))
 				bfsLightQueue.push(adjacentNode);
-
-
 		}
 	}
 }
 
-bool Chunk::spreadLight(LightNode& node, uint32_t level)
+bool Chunk::propagateLightPerFace(LightNode& source, LightNode& adjacent, BlockFace face)
 {
+	Block* sourceBlock   = source.block;
+	Block* adjacentBlock = adjacent.block;
+
+	bool propagate = false;
+
+	// check if the light should propagate through the neighbour block
+	if (isBlockOpaque(*adjacentBlock))
+	{
+		bool f1, f2, f3, f4, f5;
+
+		if (face == BlockFace::LEFT || face == BlockFace::RIGHT)
+		{
+			f1 = spreadLight(adjacent, BlockFace::NEAR,   sourceBlock->lights[(int)BlockFace::NEAR]);
+			f2 = spreadLight(adjacent, BlockFace::FAR,    sourceBlock->lights[(int)BlockFace::FAR]);
+			f3 = spreadLight(adjacent, BlockFace::TOP,    sourceBlock->lights[(int)BlockFace::TOP]);
+			f4 = spreadLight(adjacent, BlockFace::BOTTOM, sourceBlock->lights[(int)BlockFace::BOTTOM]);
+
+			if (face == BlockFace::LEFT)
+			{
+				f5 = spreadLight(adjacent, BlockFace::RIGHT, sourceBlock->lights[(int)face]);
+			}
+			else
+			{
+				f5 = spreadLight(adjacent, BlockFace::LEFT, sourceBlock->lights[(int)face]);
+			}
+		}
+		else if (face == BlockFace::TOP || face == BlockFace::BOTTOM)
+		{
+			f1 = spreadLight(adjacent, BlockFace::LEFT,  sourceBlock->lights[(int)BlockFace::LEFT]);
+			f2 = spreadLight(adjacent, BlockFace::RIGHT, sourceBlock->lights[(int)BlockFace::RIGHT]);
+			f3 = spreadLight(adjacent, BlockFace::NEAR,  sourceBlock->lights[(int)BlockFace::NEAR]);
+			f4 = spreadLight(adjacent, BlockFace::FAR,   sourceBlock->lights[(int)BlockFace::FAR]);
+
+			if (face == BlockFace::TOP)
+			{
+				f5 = spreadLight(adjacent, BlockFace::BOTTOM, sourceBlock->lights[(int)face]);
+			}
+			else
+			{
+				f5 = spreadLight(adjacent, BlockFace::TOP, sourceBlock->lights[(int)face]);
+			}
+		}
+		else //if (face == BlockFace::NEAR || face == BlockFace::FAR)
+		{
+			f1 = spreadLight(adjacent, BlockFace::LEFT,   sourceBlock->lights[(int)BlockFace::LEFT]);
+			f2 = spreadLight(adjacent, BlockFace::RIGHT,  sourceBlock->lights[(int)BlockFace::RIGHT]);
+			f3 = spreadLight(adjacent, BlockFace::TOP,    sourceBlock->lights[(int)BlockFace::TOP]);
+			f4 = spreadLight(adjacent, BlockFace::BOTTOM, sourceBlock->lights[(int)BlockFace::BOTTOM]);
+
+			if (face == BlockFace::NEAR)
+			{
+				f5 = spreadLight(adjacent, BlockFace::FAR, sourceBlock->lights[(int)face]);
+			}
+			else
+			{
+				f5 = spreadLight(adjacent, BlockFace::NEAR, sourceBlock->lights[(int)face]);
+			}
+		}
+
+		propagate = f1 || f2 || f3 || f4 || f5;
+	}
+	else
+	{
+		light_t sourceLevel = sourceBlock->lights[static_cast<int>(face)];
+
+		bool f1, f2, f3, f4, f5, f6;
+
+		f1 = spreadLight(adjacent, BlockFace::LEFT,   sourceLevel);
+		f2 = spreadLight(adjacent, BlockFace::RIGHT,  sourceLevel);
+		f3 = spreadLight(adjacent, BlockFace::TOP,    sourceLevel);
+		f4 = spreadLight(adjacent, BlockFace::BOTTOM, sourceLevel);
+		f5 = spreadLight(adjacent, BlockFace::NEAR,   sourceLevel);
+		f6 = spreadLight(adjacent, BlockFace::FAR,    sourceLevel);
+
+		propagate = f1 || f2 || f3 || f4 || f5 || f6;
+	}
+
+	return propagate;
+}
+
+bool Chunk::spreadLight(LightNode& node, BlockFace face, light_t level)
+{
+	int idx = static_cast<int>(face);
+
 	int r1 = GET_LIGHT_LEVEL_R(level);
 	int g1 = GET_LIGHT_LEVEL_G(level);
 	int b1 = GET_LIGHT_LEVEL_B(level);
 
-	int r2 = GET_LIGHT_LEVEL_R(node.lightLevel);
-	int g2 = GET_LIGHT_LEVEL_G(node.lightLevel);
-	int b2 = GET_LIGHT_LEVEL_B(node.lightLevel);
+	int r2 = GET_LIGHT_LEVEL_R(node.block->lights[idx]);
+	int g2 = GET_LIGHT_LEVEL_G(node.block->lights[idx]);
+	int b2 = GET_LIGHT_LEVEL_B(node.block->lights[idx]);
 
 	int newR = r2, newG = g2, newB = b2;
 
@@ -426,26 +510,26 @@ bool Chunk::spreadLight(LightNode& node, uint32_t level)
 
 	if (r2 + 2 <= r1 && r1 > 0)
 	{
-		SET_LIGHT_LEVEL_R(node.lightLevel, r1 - 1);
+//		SET_LIGHT_LEVEL_R(node.block->lights[idx], r1 - 1);
 		newR = r1 - 1;
 		propagate = true;
 	}
 
 	if (g2 + 2 <= g1 && g1 > 0)
 	{
-		SET_LIGHT_LEVEL_G(node.lightLevel, g1 - 1);
+//		SET_LIGHT_LEVEL_G(node.block->lights[idx], g1 - 1);
 		newG = g1 - 1;
 		propagate = true;
 	}
 
 	if (b2 + 2 <= b1 && b1 > 0)
 	{
-		SET_LIGHT_LEVEL_B(node.lightLevel, b1 - 1);
+//		SET_LIGHT_LEVEL_B(node.block->lights[idx], b1 - 1);
 		newB = b1 - 1;
 		propagate = true;
 	}
 
-	node.owner->setLightLevel(node.x, node.y, node.z, newR, newG, newB, 0);
+	node.owner->setLightLevel(node.block, newR, newG, newB, face);
 
 	return propagate;
 }
@@ -457,14 +541,14 @@ Chunk::LightNode Chunk::getLightNode(int x, int y, int z)
 		if (this->left != nullptr)
 			return this->left->getLightNode(_size + x, y, z);
 		else
-			return LightNode(0, 0, 0, 0, nullptr);
+			return LightNode(nullptr, nullptr);
 	}
 	else if (x >= _size)
 	{
 		if (this->right != nullptr)
 			return this->right->getLightNode(x - _size, y, z);
 		else
-			return LightNode(0, 0, 0, 0, nullptr);
+			return LightNode(nullptr, nullptr);
 	}
 
 	if (y < 0)
@@ -472,14 +556,14 @@ Chunk::LightNode Chunk::getLightNode(int x, int y, int z)
 		if (this->bottom != nullptr)
 			return this->bottom->getLightNode(x, _size + y, z);
 		else
-			return LightNode(0, 0, 0, 0, nullptr);
+			return LightNode(nullptr, nullptr);
 	}
 	else if (y >= _size)
 	{
 		if (this->top != nullptr)
 			return this->top->getLightNode(x, y - _size, z);
 		else
-			return LightNode(0, 0, 0, 0, nullptr);
+			return LightNode(nullptr, nullptr);
 	}
 
 	if (z < 0)
@@ -487,26 +571,28 @@ Chunk::LightNode Chunk::getLightNode(int x, int y, int z)
 		if (this->near != nullptr)
 			return this->near->getLightNode(x, y, _size + z);
 		else
-			return LightNode(0, 0, 0, 0, nullptr);
+			return LightNode(nullptr, nullptr);
 	}
 	else if (z >= _size)
 	{
 		if (this->far != nullptr)
 			return this->far->getLightNode(x, y, z - _size);
 		else
-			return LightNode(0, 0, 0, 0, nullptr);
+			return LightNode(nullptr, nullptr);
 	}
 
 	Block* block = getBlock(x, y, z);
 
-	return LightNode(block->x, block->y, block->z, block->light, this);
+	return LightNode(block, this);
 }
 
-ColorRGB32f Chunk::getBlockColor(Block& block)
+ColorRGB32f Chunk::getBlockColor(Block& block, BlockFace face)
 {
-	uint8_t ri = GET_LIGHT_LEVEL_R(block.light);
-	uint8_t gi = GET_LIGHT_LEVEL_G(block.light);
-	uint8_t bi = GET_LIGHT_LEVEL_B(block.light);
+	light_t light = block.lights[static_cast<int>(face)];
+
+	uint8_t ri = GET_LIGHT_LEVEL_R(light);
+	uint8_t gi = GET_LIGHT_LEVEL_G(light);
+	uint8_t bi = GET_LIGHT_LEVEL_B(light);
 
 	float rf = (float)ri / (float)CHNL_MASK;
 	float gf = (float)gi / (float)CHNL_MASK;

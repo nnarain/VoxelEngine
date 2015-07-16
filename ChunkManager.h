@@ -66,10 +66,6 @@ namespace engine
 		void setLightSource(int x, int y, int z, int r, int g, int b);
 
 		/**
-		*/
-		void setLightLevel(int x, int y, int z, int r, int g, int b);
-
-		/**
 		
 		*/
 		Block getBlockFromWorldPosition(const sgl::Vector3& position);

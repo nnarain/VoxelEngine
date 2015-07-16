@@ -8,9 +8,6 @@
 
 #include <cstdint>
 
-#define CLR(x, y) (x &= ~y)
-#define SET(x, y) (x |= y)
-
 #define R_MASK 0x000F
 #define G_MASK 0x00F0
 #define B_MASK 0x0F00
@@ -37,6 +34,10 @@ struct Vertex
 	{
 	}
 
+	Vertex(sgl::Vector3& pos, sgl::Vector3& n) : Vertex(pos, n, sgl::ColorRGB32f(1, 1, 1))
+	{
+	}
+
 	Vertex(sgl::Vector3& pos) : Vertex(pos, sgl::Vector3(0, 0, 0), sgl::ColorRGB32f(1,1,1))
 	{
 	}
@@ -53,15 +54,28 @@ struct Block
 	{
 	}
 
-	Block(uint8_t t, uint8_t x, uint8_t y, uint8_t z) : t(t), x(x), y(y), z(z), light(0)
+	Block(uint8_t t, uint8_t x, uint8_t y, uint8_t z) : t(t), x(x), y(y), z(z)
 	{
+		lights[0] = 0;
+		lights[1] = 0;
+		lights[2] = 0;
+		lights[3] = 0;
+		lights[4] = 0;
+		lights[5] = 0;
 	}
 
 	uint8_t  t;
 	uint8_t  x;
 	uint8_t  y;
 	uint8_t  z;
-	light_t light;
+	light_t lights[6];
+};
+
+enum class BlockFace
+{
+	LEFT, RIGHT,
+	TOP,  BOTTOM,
+	NEAR, FAR
 };
 
 static bool isBlockOpaque(Block& block)

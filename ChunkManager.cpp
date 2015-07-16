@@ -196,21 +196,7 @@ void ChunkManager::setLightSource(int x, int y, int z, int r, int g, int b)
 	int blockZ = z % _blocksPerChunk;
 
 	Chunk& chunk = getChunk(chunkX, chunkY, chunkZ);
-	chunk.setLightSource(blockX, blockY, blockZ, r, g, b, 0);
-}
-
-void ChunkManager::setLightLevel(int x, int y, int z, int r, int g, int b)
-{
-	int chunkX = x / _blocksPerChunk;
-	int chunkY = y / _blocksPerChunk;
-	int chunkZ = z / _blocksPerChunk;
-
-	int blockX = x % _blocksPerChunk;
-	int blockY = y % _blocksPerChunk;
-	int blockZ = z % _blocksPerChunk;
-
-	Chunk& chunk = getChunk(chunkX, chunkY, chunkZ);
-	chunk.setLightLevel(blockX, blockY, blockZ, r, g, b, 0);
+	chunk.setLightSource(blockX, blockY, blockZ, r, g, b);
 }
 
 Chunk& ChunkManager::getChunk(int x, int y, int z)
