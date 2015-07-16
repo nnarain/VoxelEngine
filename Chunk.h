@@ -9,7 +9,9 @@
 #include <SGL/Math/Matrix4.h>
 
 #include <vector>
+#include <queue>
 #include <set>
+#include <map>
 #include <string>
 #include <functional>
 
@@ -33,6 +35,8 @@ namespace engine
 		void setBlock(int x, int y, int z, int t);
 
 		void setLightSource(int x, int y, int z, int r, int g, int b);
+
+		void removeLight(int x, int y, int z);
 
 		bool isSetup(void) const;
 
@@ -87,6 +91,8 @@ namespace engine
 			Chunk* owner;
 		};
 
+		typedef std::map<Block*, LightNode> LightMap;
+
 		sgl::Mesh _mesh;
 
 		std::vector<Face> _buffer;
@@ -96,7 +102,8 @@ namespace engine
 		std::vector<Block> _blocks;
 		std::vector<bool> _hasLocationFlags;
 
-		std::vector<LightNode> _lightSourceList;
+		LightMap _lightSourceList;
+		LightMap _lightRemovalList;
 
 		std::string _atlasName;
 
@@ -122,12 +129,15 @@ namespace engine
 
 		void propagateLight();
 		bool propagateLightPerFace(LightNode& source, LightNode& block, BlockFace face);
-
 		bool spreadLight(LightNode& node, BlockFace face, light_t level);
-
 		void setLightLevel(Block* block, int r, int g, int b, BlockFace face);
 
 		LightNode getLightNode(int x, int y, int z);
+
+		void removeLightSources();
+		void clearBlockLight(Block* block);
+
+		void clearAdjacentBlockLight(LightNode node, std::queue<LightNode>& queue);
 
 		sgl::ColorRGB32f getBlockColor(Block& block, BlockFace face);
 	};

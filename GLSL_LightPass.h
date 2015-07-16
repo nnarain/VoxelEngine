@@ -53,7 +53,8 @@ namespace sgl
 				diffuseColor = vec3(1, 1, 1) * 0.2 * diffuseFactor;
 			}
 
-			fragColor = (baseColor)* (ambientColor + diffuseColor + lightColor);
+			//fragColor = (baseColor)* (ambientColor + diffuseColor + lightColor);
+			fragColor = lightColor;
 		}
 
 		vec2 calcTexCoord()

@@ -83,4 +83,9 @@ static bool isBlockOpaque(Block& block)
 	return block.t != 0;
 }
 
+static bool hasLight(Block& block)
+{
+	return (block.lights[0] | block.lights[1] | block.lights[2] | block.lights[3] | block.lights[4] | block.lights[5]) != 0;
+}
+
 #endif

@@ -6,7 +6,6 @@
 #include <SGL/Math/Vector4.h>
 
 #include <iostream>
-#include <queue>
 #include <memory>
 
 using namespace engine;
@@ -130,7 +129,18 @@ void Chunk::setLightSource(int x, int y, int z, int r, int g, int b)
 	setLightLevel(block, r, g, b, BlockFace::NEAR);
 	setLightLevel(block, r, g, b, BlockFace::FAR);
 
-	_lightSourceList.emplace_back(block, this);
+
+	_lightSourceList[block] = LightNode(block, this);
+}
+
+void Chunk::removeLight(int x, int y, int z)
+{
+	Block* block = getBlock(x, y, z);
+
+	_lightRemovalList[block] = LightNode(block, this);
+
+	_updateCallback(this);
+	_dirty = true;
 }
 
 void Chunk::setLightLevel(Block* block, int r, int g, int b, BlockFace face)
@@ -159,6 +169,9 @@ void Chunk::build()
 
 	// clear existing data from the buffer
 	_buffer.clear();
+
+	// remove any sources that are listed
+	removeLightSources();
 
 	// propagate any light sources in the chunk
 	propagateLight();
@@ -350,13 +363,13 @@ Chunk::Face Chunk::textureFace(Vertex& v1, Vertex& v2, Vertex& v3, Block block, 
 
 void Chunk::propagateLight()
 {
-	std::vector<LightNode>::iterator iter;
+	LightMap::iterator iter;
 	for (iter = _lightSourceList.begin(); iter != _lightSourceList.end(); ++iter)
 	{
 		// breathe first searh queue of light nodes
 		std::queue<LightNode> bfsLightQueue;
 
-		bfsLightQueue.push(*iter);
+		bfsLightQueue.push(iter->second);
 
 		while (!bfsLightQueue.empty())
 		{
@@ -494,42 +507,62 @@ bool Chunk::propagateLightPerFace(LightNode& source, LightNode& adjacent, BlockF
 
 bool Chunk::spreadLight(LightNode& node, BlockFace face, light_t level)
 {
+	static Vector3 neighbours[] = {
+		Vector3(-1, 0, 0), // left
+		Vector3(1, 0, 0),  // right
+		Vector3(0, 1, 0),  // top
+		Vector3(0, -1, 0), // bottom
+		Vector3(0, 0, -1), // near
+		Vector3(0, 0, 1)   // far
+	};
+
 	int idx = static_cast<int>(face);
 
-	int r1 = GET_LIGHT_LEVEL_R(level);
-	int g1 = GET_LIGHT_LEVEL_G(level);
-	int b1 = GET_LIGHT_LEVEL_B(level);
+	Vector3 neighbour = neighbours[idx];
+	Block* neighbourBlock = node.owner->getAdjacentBlock(
+		(int)node.block->x + (int)neighbour.x,
+		(int)node.block->y + (int)neighbour.y,
+		(int)node.block->z + (int)neighbour.z
+	);
 
-	int r2 = GET_LIGHT_LEVEL_R(node.block->lights[idx]);
-	int g2 = GET_LIGHT_LEVEL_G(node.block->lights[idx]);
-	int b2 = GET_LIGHT_LEVEL_B(node.block->lights[idx]);
+	bool isNeighbourActive = (neighbourBlock != nullptr) && (neighbourBlock->t != 0);
 
-	int newR = r2, newG = g2, newB = b2;
+	bool shouldPropagate = (node.block->t == 0) || !isNeighbourActive;
 
 	bool propagate = false;
 
-	if (r2 + 2 <= r1 && r1 > 0)
+	if (shouldPropagate)
 	{
-//		SET_LIGHT_LEVEL_R(node.block->lights[idx], r1 - 1);
-		newR = r1 - 1;
-		propagate = true;
-	}
+		int r1 = GET_LIGHT_LEVEL_R(level);
+		int g1 = GET_LIGHT_LEVEL_G(level);
+		int b1 = GET_LIGHT_LEVEL_B(level);
 
-	if (g2 + 2 <= g1 && g1 > 0)
-	{
-//		SET_LIGHT_LEVEL_G(node.block->lights[idx], g1 - 1);
-		newG = g1 - 1;
-		propagate = true;
-	}
+		int r2 = GET_LIGHT_LEVEL_R(node.block->lights[idx]);
+		int g2 = GET_LIGHT_LEVEL_G(node.block->lights[idx]);
+		int b2 = GET_LIGHT_LEVEL_B(node.block->lights[idx]);
 
-	if (b2 + 2 <= b1 && b1 > 0)
-	{
-//		SET_LIGHT_LEVEL_B(node.block->lights[idx], b1 - 1);
-		newB = b1 - 1;
-		propagate = true;
-	}
+		int newR = r2, newG = g2, newB = b2;
 
-	node.owner->setLightLevel(node.block, newR, newG, newB, face);
+		if (r2 + 2 <= r1 && r1 > 0)
+		{
+			newR = r1 - 1;
+			propagate = true;
+		}
+
+		if (g2 + 2 <= g1 && g1 > 0)
+		{
+			newG = g1 - 1;
+			propagate = true;
+		}
+
+		if (b2 + 2 <= b1 && b1 > 0)
+		{
+			newB = b1 - 1;
+			propagate = true;
+		}
+
+		node.owner->setLightLevel(node.block, newR, newG, newB, face);
+	}
 
 	return propagate;
 }
@@ -584,6 +617,59 @@ Chunk::LightNode Chunk::getLightNode(int x, int y, int z)
 	Block* block = getBlock(x, y, z);
 
 	return LightNode(block, this);
+}
+
+void Chunk::removeLightSources()
+{
+	LightMap::iterator iter;
+	for (iter = _lightRemovalList.begin(); iter != _lightRemovalList.end(); ++iter)
+	{
+		std::queue<LightNode> bfsLightQueue;
+
+		bfsLightQueue.push(iter->second);
+
+		while (!bfsLightQueue.empty())
+		{
+			LightNode node = bfsLightQueue.front();
+
+			int x = (int)node.block->x;
+			int y = (int)node.block->y;
+			int z = (int)node.block->z;
+
+			Chunk* owner = node.owner;
+
+			bfsLightQueue.pop();
+
+			clearAdjacentBlockLight(owner->getLightNode(x + 1, y, z), bfsLightQueue);
+			clearAdjacentBlockLight(owner->getLightNode(x - 1, y, z), bfsLightQueue);
+			clearAdjacentBlockLight(owner->getLightNode(x, y + 1, z), bfsLightQueue);
+			clearAdjacentBlockLight(owner->getLightNode(x, y - 1, z), bfsLightQueue);
+			clearAdjacentBlockLight(owner->getLightNode(x, y, z - 1), bfsLightQueue);
+			clearAdjacentBlockLight(owner->getLightNode(x, y, z + 1), bfsLightQueue);
+
+		}
+	}
+}
+
+void Chunk::clearAdjacentBlockLight(LightNode node, std::queue<LightNode>& queue)
+{
+	if (node.owner != nullptr)
+		if (hasLight(*node.block))
+		{
+			queue.push(node);
+		}
+	clearBlockLight(node.block);
+}
+
+void Chunk::clearBlockLight(Block* block)
+{
+	if (block != nullptr)
+	{
+		if (_lightSourceList.find(block) != _lightSourceList.end())
+		{
+			memset(block->lights, 0, sizeof(light_t) * 6);
+		}
+	}
 }
 
 ColorRGB32f Chunk::getBlockColor(Block& block, BlockFace face)

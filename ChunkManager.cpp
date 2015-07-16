@@ -199,6 +199,20 @@ void ChunkManager::setLightSource(int x, int y, int z, int r, int g, int b)
 	chunk.setLightSource(blockX, blockY, blockZ, r, g, b);
 }
 
+void ChunkManager::removeLight(int x, int y, int z)
+{
+	int chunkX = x / _blocksPerChunk;
+	int chunkY = y / _blocksPerChunk;
+	int chunkZ = z / _blocksPerChunk;
+
+	int blockX = x % _blocksPerChunk;
+	int blockY = y % _blocksPerChunk;
+	int blockZ = z % _blocksPerChunk;
+
+	Chunk& chunk = getChunk(chunkX, chunkY, chunkZ);
+	chunk.removeLight(blockX, blockY, blockZ);
+}
+
 Chunk& ChunkManager::getChunk(int x, int y, int z)
 {
 	if (x < 0) x = 0;

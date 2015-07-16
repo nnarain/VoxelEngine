@@ -65,6 +65,8 @@ namespace engine
 		*/
 		void setLightSource(int x, int y, int z, int r, int g, int b);
 
+		void removeLight(int x, int y, int z);
+
 		/**
 		
 		*/
