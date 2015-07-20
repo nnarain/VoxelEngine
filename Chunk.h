@@ -134,11 +134,10 @@ namespace engine
 		void setLightLevel(Block* block, int r, int g, int b, BlockFace face);
 
 		LightNode getLightNode(int x, int y, int z);
+		LightNode getLightNode(Block* block, BlockFace face);
 
 		void removeLightSources();
 		void clearBlockLight(Block* block);
-
-		void clearAdjacentBlockLight(LightNode node, std::queue<LightNode>& queue);
 
 		sgl::ColorRGB32f getBlockColor(Block& block, BlockFace face);
 	};

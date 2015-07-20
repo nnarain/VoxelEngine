@@ -625,70 +625,165 @@ Chunk::LightNode Chunk::getLightNode(int x, int y, int z)
 
 void Chunk::removeLightSources()
 {
-	LightMap::iterator iter;
-	for (iter = _lightRemovalList.begin(); iter != _lightRemovalList.end(); ++iter)
+	ChunkSet updateSet;
+
+	for (auto& iter : _lightRemovalList)
 	{
-		std::queue<LightNode> bfsLightQueue;
+		std::queue<LightNode> lightQueue;
+		std::map<Block*, int> intensities;
 
-		bfsLightQueue.push(iter->second);
+		// add the source node to the FIFO queue
+		lightQueue.push(iter.second);
 
-		while (!bfsLightQueue.empty())
+		// get the highest light intensity of each channel of each face
+
+		int sourceIntensity = 0;
+
+		int i;
+		for (i = 0; i < 6; ++i)
 		{
-			LightNode node = bfsLightQueue.front();
+			int r = GET_LIGHT_LEVEL_R(iter.second.block->lights[i]);
+			int g = GET_LIGHT_LEVEL_G(iter.second.block->lights[i]);
+			int b = GET_LIGHT_LEVEL_B(iter.second.block->lights[i]);
 
-			int x = (int)node.block->x;
-			int y = (int)node.block->y;
-			int z = (int)node.block->z;
-
-			Chunk* owner = node.owner;
-
-			bfsLightQueue.pop();
-
-			clearAdjacentBlockLight(owner->getLightNode(x + 1, y, z), bfsLightQueue);
-			clearAdjacentBlockLight(owner->getLightNode(x - 1, y, z), bfsLightQueue);
-			clearAdjacentBlockLight(owner->getLightNode(x, y + 1, z), bfsLightQueue);
-			clearAdjacentBlockLight(owner->getLightNode(x, y - 1, z), bfsLightQueue);
-			clearAdjacentBlockLight(owner->getLightNode(x, y, z - 1), bfsLightQueue);
-			clearAdjacentBlockLight(owner->getLightNode(x, y, z + 1), bfsLightQueue);
-
+			sourceIntensity = std::max(std::max(std::max(r, g), b), sourceIntensity);
 		}
+
+		// clear the source block light
+		clearBlockLight(iter.second.block);
+
+		// set the intensity value in the map
+		intensities[iter.second.block] = sourceIntensity;
+
+		while (!lightQueue.empty())
+		{
+			LightNode source = lightQueue.front();
+
+			int x = (int)source.block->x;
+			int y = (int)source.block->y;
+			int z = (int)source.block->z;
+
+			lightQueue.pop();
+
+			int intensity = intensities[source.block];
+
+			if (intensity > 0)
+			{
+				LightNode adjacent;
+
+				adjacent = source.owner->getLightNode(x - 1, y, z);
+				if (adjacent.block != nullptr && intensities.find(adjacent.block) == intensities.end())
+				{
+					lightQueue.push(adjacent);
+					intensities[adjacent.block] = intensity - 1;
+					clearBlockLight(adjacent.block);
+					updateSet.insert(adjacent.owner);
+				}
+
+				adjacent = source.owner->getLightNode(x + 1, y, z);
+				if (adjacent.block != nullptr && intensities.find(adjacent.block) == intensities.end())
+				{
+					lightQueue.push(adjacent);
+					intensities[adjacent.block] = intensity - 1;
+					clearBlockLight(adjacent.block);
+					updateSet.insert(adjacent.owner);
+				}
+
+				adjacent = source.owner->getLightNode(x, y + 1, z);
+				if (adjacent.block != nullptr && intensities.find(adjacent.block) == intensities.end())
+				{
+					lightQueue.push(adjacent);
+					intensities[adjacent.block] = intensity - 1;
+					clearBlockLight(adjacent.block);
+					updateSet.insert(adjacent.owner);
+				}
+
+				adjacent = source.owner->getLightNode(x, y - 1, z);
+				if (adjacent.block != nullptr && intensities.find(adjacent.block) == intensities.end())
+				{
+					lightQueue.push(adjacent);
+					intensities[adjacent.block] = intensity - 1;
+					clearBlockLight(adjacent.block);
+					updateSet.insert(adjacent.owner);
+				}
+
+				adjacent = source.owner->getLightNode(x, y, z - 1);
+				if (adjacent.block != nullptr && intensities.find(adjacent.block) == intensities.end())
+				{
+					lightQueue.push(adjacent);
+					intensities[adjacent.block] = intensity - 1;
+					clearBlockLight(adjacent.block);
+					updateSet.insert(adjacent.owner);
+				}
+
+				adjacent = source.owner->getLightNode(x, y, z + 1);
+				if (adjacent.block != nullptr && intensities.find(adjacent.block) == intensities.end())
+				{
+					lightQueue.push(adjacent);
+					intensities[adjacent.block] = intensity - 1;
+					clearBlockLight(adjacent.block);
+					updateSet.insert(adjacent.owner);
+				}
+			}
+		}
+
+		_lightSourceList.erase(iter.second.block);
 	}
-}
 
-void Chunk::clearAdjacentBlockLight(LightNode node, std::queue<LightNode>& queue)
-{
-	if (node.owner != nullptr)
-		if (hasLight(*node.block))
-		{
-			queue.push(node);
-		}
-	clearBlockLight(node.block);
+	for (auto& chunk : updateSet)
+	{
+		chunk->markForUpdate();
+	}
 }
 
 void Chunk::clearBlockLight(Block* block)
 {
-	if (block != nullptr)
-	{
-		if (_lightSourceList.find(block) != _lightSourceList.end())
-		{
-			memset(block->lights, 0, sizeof(light_t) * 6);
-		}
-	}
+	block->lights[0] = 0;
+	block->lights[1] = 0;
+	block->lights[2] = 0;
+	block->lights[3] = 0;
+	block->lights[4] = 0;
+	block->lights[5] = 0;
 }
 
 ColorRGB32f Chunk::getBlockColor(Block& block, BlockFace face)
 {
 	light_t light = block.lights[static_cast<int>(face)];
 
+	// get the channel values
 	uint8_t ri = GET_LIGHT_LEVEL_R(light);
 	uint8_t gi = GET_LIGHT_LEVEL_G(light);
 	uint8_t bi = GET_LIGHT_LEVEL_B(light);
 
+	// convert to floating point
 	float rf = (float)ri / (float)CHNL_MASK;
 	float gf = (float)gi / (float)CHNL_MASK;
 	float bf = (float)bi / (float)CHNL_MASK;
 
+	//
 	return ColorRGB32f(rf, gf, bf);
+}
+
+Chunk::LightNode Chunk::getLightNode(Block* block, BlockFace face)
+{
+	switch (face)
+	{
+	case BlockFace::LEFT:
+		return getLightNode((int)block->x - 1, (int)block->y, (int)block->z);
+	case BlockFace::RIGHT:
+		return getLightNode((int)block->x + 1, (int)block->y, (int)block->z);
+	case BlockFace::TOP:
+		return getLightNode((int)block->x, (int)block->y + 1, (int)block->z);
+	case BlockFace::BOTTOM:
+		return getLightNode((int)block->x, (int)block->y - 1, (int)block->z);
+	case BlockFace::NEAR:
+		return getLightNode((int)block->x, (int)block->y, (int)block->z - 1);
+	case BlockFace::FAR:
+		return getLightNode((int)block->x, (int)block->y, (int)block->z + 1);
+
+	default:
+		return LightNode(nullptr, nullptr);
+	}
 }
 
 bool Chunk::isSetup(void) const
