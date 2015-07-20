@@ -54,6 +54,7 @@ namespace engine
 		sgl::Sphere& getBounds();
 
 		void setUpdateCallback(std::function<void(Chunk*)> callback);
+		void markForUpdate();
 
 	public:
 

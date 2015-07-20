@@ -21,10 +21,10 @@
 #define GET_LIGHT_LEVEL_B(light) ((light & B_MASK) >> (CHNL_BITS * 2) )
 #define GET_LIGHT_LEVEL_A(light) ((light & A_MASK) >> (CHNL_BITS * 3) )
 
-#define SET_LIGHT_LEVEL_R(light, level) (light) |= ( ( (light) & ~R_MASK ) | ((level) & CHNL_MASK) )
-#define SET_LIGHT_LEVEL_G(light, level) (light) |= ( ( (light) & ~G_MASK ) | ((level) & CHNL_MASK) << (CHNL_BITS) )
-#define SET_LIGHT_LEVEL_B(light, level) (light) |= ( ( (light) & ~B_MASK ) | ((level) & CHNL_MASK) << (CHNL_BITS * 2) )
-#define SET_LIGHT_LEVEL_A(light, level) (light) |= ( ( (light) & ~A_MASK ) | ((level) & CHNL_MASK) << (CHNL_BITS * 3) )
+#define SET_LIGHT_LEVEL_R(light, level) (light) = ( ( (light) & ~R_MASK ) | ((level) & CHNL_MASK) )
+#define SET_LIGHT_LEVEL_G(light, level) (light) = ( ( (light) & ~G_MASK ) | ((level) & CHNL_MASK) << (CHNL_BITS) )
+#define SET_LIGHT_LEVEL_B(light, level) (light) = ( ( (light) & ~B_MASK ) | ((level) & CHNL_MASK) << (CHNL_BITS * 2) )
+#define SET_LIGHT_LEVEL_A(light, level) (light) = ( ( (light) & ~A_MASK ) | ((level) & CHNL_MASK) << (CHNL_BITS * 3) )
 
 typedef uint16_t light_t;
 

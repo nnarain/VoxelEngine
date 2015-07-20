@@ -150,10 +150,6 @@ void Chunk::setLightLevel(Block* block, int r, int g, int b, BlockFace face)
 	SET_LIGHT_LEVEL_R(block->lights[idx], r);
 	SET_LIGHT_LEVEL_G(block->lights[idx], g);
 	SET_LIGHT_LEVEL_B(block->lights[idx], b);
-
-	// notify the parent that this chunk needs to be rebuilt
-	_updateCallback(this);
-	_dirty = true;
 }
 
 void Chunk::render()
@@ -363,16 +359,19 @@ Chunk::Face Chunk::textureFace(Vertex& v1, Vertex& v2, Vertex& v3, Block block, 
 
 void Chunk::propagateLight()
 {
-	LightMap::iterator iter;
-	for (iter = _lightSourceList.begin(); iter != _lightSourceList.end(); ++iter)
+	// keep a set of all chunks that are affected by the light propagation
+	ChunkSet updateSet;
+
+	for (auto& source : _lightSourceList)
 	{
 		// breathe first searh queue of light nodes
 		std::queue<LightNode> bfsLightQueue;
 
-		bfsLightQueue.push(iter->second);
+		bfsLightQueue.push(source.second);
 
 		while (!bfsLightQueue.empty())
 		{
+
 			// get the next node
 			LightNode node = bfsLightQueue.front();
 
@@ -383,6 +382,7 @@ void Chunk::propagateLight()
 			int z = (int)node.block->z;
 
 			Chunk* owner = node.owner;
+			updateSet.insert(owner);
 
 			// remove node from queue
 			bfsLightQueue.pop();
@@ -421,6 +421,12 @@ void Chunk::propagateLight()
 				bfsLightQueue.push(adjacentNode);
 		}
 	}
+
+	// update all chunks affected
+	for (auto& chunk : updateSet)
+		chunk->markForUpdate();
+
+
 }
 
 bool Chunk::propagateLightPerFace(LightNode& source, LightNode& adjacent, BlockFace face)
@@ -508,12 +514,12 @@ bool Chunk::propagateLightPerFace(LightNode& source, LightNode& adjacent, BlockF
 bool Chunk::spreadLight(LightNode& node, BlockFace face, light_t level)
 {
 	static Vector3 neighbours[] = {
-		Vector3(-1, 0, 0), // left
-		Vector3(1, 0, 0),  // right
-		Vector3(0, 1, 0),  // top
-		Vector3(0, -1, 0), // bottom
-		Vector3(0, 0, -1), // near
-		Vector3(0, 0, 1)   // far
+		Vector3(-1,  0,  0), // left
+		Vector3( 1,  0,  0), // right
+		Vector3( 0,  1,  0), // top
+		Vector3( 0, -1,  0), // bottom
+		Vector3( 0,  0, -1), // near
+		Vector3( 0,  0,  1)  // far
 	};
 
 	int idx = static_cast<int>(face);
@@ -527,11 +533,9 @@ bool Chunk::spreadLight(LightNode& node, BlockFace face, light_t level)
 
 	bool isNeighbourActive = (neighbourBlock != nullptr) && (neighbourBlock->t != 0);
 
-	bool shouldPropagate = (node.block->t == 0) || !isNeighbourActive;
-
 	bool propagate = false;
 
-	if (shouldPropagate)
+	if ((node.block->t == 0) || !isNeighbourActive)
 	{
 		int r1 = GET_LIGHT_LEVEL_R(level);
 		int g1 = GET_LIGHT_LEVEL_G(level);
@@ -543,19 +547,19 @@ bool Chunk::spreadLight(LightNode& node, BlockFace face, light_t level)
 
 		int newR = r2, newG = g2, newB = b2;
 
-		if (r2 + 2 <= r1 && r1 > 0)
+		if (r2 + 2 <= r1)
 		{
 			newR = r1 - 1;
 			propagate = true;
 		}
 
-		if (g2 + 2 <= g1 && g1 > 0)
+		if (g2 + 2 <= g1)
 		{
 			newG = g1 - 1;
 			propagate = true;
 		}
 
-		if (b2 + 2 <= b1 && b1 > 0)
+		if (b2 + 2 <= b1)
 		{
 			newB = b1 - 1;
 			propagate = true;
@@ -762,6 +766,12 @@ Sphere& Chunk::getBounds()
 void Chunk::setUpdateCallback(std::function<void(Chunk*)> callback)
 {
 	_updateCallback = callback;
+}
+
+void Chunk::markForUpdate()
+{
+	_updateCallback(this);
+	_dirty = true;
 }
 
 Chunk::~Chunk()
