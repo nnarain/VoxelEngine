@@ -513,6 +513,7 @@ bool Chunk::propagateLightPerFace(LightNode& source, LightNode& adjacent, BlockF
 
 bool Chunk::spreadLight(LightNode& node, BlockFace face, light_t level)
 {
+	// vectors corresponding to each face
 	static Vector3 neighbours[] = {
 		Vector3(-1,  0,  0), // left
 		Vector3( 1,  0,  0), // right
@@ -522,8 +523,10 @@ bool Chunk::spreadLight(LightNode& node, BlockFace face, light_t level)
 		Vector3( 0,  0,  1)  // far
 	};
 
+	// get the face index
 	int idx = static_cast<int>(face);
 
+	// the neighboring block
 	Vector3 neighbour = neighbours[idx];
 	Block* neighbourBlock = node.owner->getAdjacentBlock(
 		(int)node.block->x + (int)neighbour.x,
@@ -531,21 +534,31 @@ bool Chunk::spreadLight(LightNode& node, BlockFace face, light_t level)
 		(int)node.block->z + (int)neighbour.z
 	);
 
+	// 
 	bool isNeighbourActive = (neighbourBlock != nullptr) && (neighbourBlock->t != 0);
 
+	// flag, whether or not to propagate light of this node for this face
 	bool propagate = false;
 
+	// propagate the light, if the node is a air block (t == 0) of its neighbor is not active
 	if ((node.block->t == 0) || !isNeighbourActive)
 	{
+		// get the source lights channel values
+
 		int r1 = GET_LIGHT_LEVEL_R(level);
 		int g1 = GET_LIGHT_LEVEL_G(level);
 		int b1 = GET_LIGHT_LEVEL_B(level);
+
+		// get the current channel values
 
 		int r2 = GET_LIGHT_LEVEL_R(node.block->lights[idx]);
 		int g2 = GET_LIGHT_LEVEL_G(node.block->lights[idx]);
 		int b2 = GET_LIGHT_LEVEL_B(node.block->lights[idx]);
 
+		//
 		int newR = r2, newG = g2, newB = b2;
+
+		// if the current level is 2 or more less than the new level it can be brightened
 
 		if (r2 + 2 <= r1)
 		{
@@ -565,9 +578,11 @@ bool Chunk::spreadLight(LightNode& node, BlockFace face, light_t level)
 			propagate = true;
 		}
 
+		// set the new level
 		node.owner->setLightLevel(node.block, newR, newG, newB, face);
 	}
 
+	// return propage
 	return propagate;
 }
 
@@ -667,10 +682,15 @@ void Chunk::removeLightSources()
 
 			lightQueue.pop();
 
+			// intensity of the current block
 			int intensity = intensities[source.block];
 
+			// 
 			if (intensity > 0)
 			{
+				// get every adjacent block to the current node and clear its light channels
+				// then add its owning chunk to the update set
+
 				LightNode adjacent;
 
 				adjacent = source.owner->getLightNode(x - 1, y, z);
@@ -723,7 +743,7 @@ void Chunk::clearLightNode(LightNode& node, std::queue<LightNode>& queue, std::m
 		{
 			LightMap& sourceList = node.owner->getLightSourceMap();
 
-			// and the block isn't in the source list
+			// and the block isn't in the parent chunk's source list
 			if (sourceList.find(node.block) == sourceList.end())
 			{
 				queue.push(node);
@@ -764,6 +784,8 @@ ColorRGB32f Chunk::getBlockColor(Block& block, BlockFace face)
 
 Chunk::LightNode Chunk::getLightNode(Block* block, BlockFace face)
 {
+	// get the node by getting the neighbor block that coresponds to the face
+
 	switch (face)
 	{
 	case BlockFace::LEFT:
@@ -868,6 +890,8 @@ Chunk::LightMap& Chunk::getLightSourceMap()
 
 void Chunk::markForUpdate()
 {
+	// notify the parent chunk manager that an update is required
+
 	_updateCallback(this);
 	_dirty = true;
 }
