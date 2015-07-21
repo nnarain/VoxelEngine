@@ -63,6 +63,32 @@ namespace sgl
 		}
 
 	);
+
+	const std::string GLSL_DEBUG_LIGHTPASS_FRAG = GLSL(
+
+		out vec3 fragColor;
+
+		uniform vec2 screenSize;
+
+		uniform sampler2D sampler;
+
+		vec2 calcTexCoord();
+
+		void main()
+		{
+			vec2 texCoord = calcTexCoord();
+
+			vec3 texColor = texture(sampler, texCoord).xyz;
+
+			fragColor = texColor;
+		}
+
+		vec2 calcTexCoord()
+		{
+			return gl_FragCoord.xy / screenSize;
+		}
+
+	);
 }
 
 #endif

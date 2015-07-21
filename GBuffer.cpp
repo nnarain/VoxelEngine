@@ -56,6 +56,11 @@ void GBuffer::init(int width, int height)
 	_fbo.checkError();
 
 	_fbo.unbind();
+
+	// add the textures to the map
+	_textureMap["normal-map"]  = &_normalTexture;
+	_textureMap["diffuse-map"] = &_diffuseTexture;
+	_textureMap["color-map"]   = &_colorTexture;
 }
 
 Texture& GBuffer::getNormalTexture()
@@ -91,6 +96,11 @@ void GBuffer::initTexture(sgl::Texture& texture, int width, int height)
 	texture.parameter(Texture::ParamName::MIN_FILTER, Texture::Param::LINEAR);
 
 	texture.unbind();
+}
+
+Texture& GBuffer::getTexture(const std::string& key)
+{
+	return *(_textureMap[key]);
 }
 
 GBuffer::~GBuffer()

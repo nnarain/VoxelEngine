@@ -7,6 +7,10 @@
 
 #include <SGL/Math/Matrix4.h>
 
+#include <map>
+#include <string>
+
+
 namespace engine
 {
 	class IRenderer
@@ -21,7 +25,15 @@ namespace engine
 		virtual void render(ChunkManager& chunkManager, sgl::Matrix4& VP) = 0;
 		virtual void end()                                                = 0;
 
+		bool isInitialized();
+
+		void setRenderOption(const std::string& key, const std::string& value);
+		std::string getRenderOption(const std::string& key);
+
 	protected:
+		bool initialized;
+
+		std::map<std::string, std::string> renderOptions;
 	};
 }
 

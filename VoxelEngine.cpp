@@ -1,5 +1,7 @@
 
 #include "VoxelEngine.h"
+#include "DeferredRenderer.h"
+#include "DebugDeferredRenderer.h"
 
 #include <SGL/SGL.h>
 #include <SGL/Util/Context.h>
@@ -108,11 +110,16 @@ void VoxelEngine::initializeContext()
 	glfwMakeContextCurrent(_window->getWindow());
 	sgl::init();
 
-	_renderer = new DeferredRenderer();
-	_renderer->init();
+	allocateRenderers();
 
-	_debugRenderer = std::make_unique<DebugRenderer>();
-	_debugRenderer->init();
+	// set to the default renderer
+	setRenderer(1);
+}
+
+void VoxelEngine::allocateRenderers()
+{
+	_renderers.push_back(new DeferredRenderer());
+	_renderers.push_back(new DebugDeferredRenderer());
 }
 
 void VoxelEngine::loadTexture(const char *textureName)
@@ -130,9 +137,14 @@ IRenderer& VoxelEngine::getRenderer()
 	return *(_renderer);
 }
 
-sgl::DebugRenderer& VoxelEngine::getDebugRenderer()
+void VoxelEngine::setRenderer(unsigned int idx)
 {
-	return *(_debugRenderer.get());
+	if (idx >= _renderers.size()) return;
+
+	_renderer = _renderers[idx];
+	
+	if (!_renderer->isInitialized())
+		_renderer->init();
 }
 
 ResourceManager& VoxelEngine::getResources()
@@ -163,7 +175,8 @@ VoxelEngine* VoxelEngine::getEngine()
 
 VoxelEngine::~VoxelEngine()
 {
-	delete _renderer;
+	for (IRenderer* renderer : _renderers)
+		delete renderer;
 }
 
 

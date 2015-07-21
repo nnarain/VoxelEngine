@@ -5,7 +5,7 @@
 #include "ChunkManager.h"
 #include "FPSCamera.h"
 #include "Window.h"
-#include "DeferredRenderer.h"
+#include "IRenderer.h"
 #include "ResourceManager.h"
 #include "Logger.h"
 
@@ -39,7 +39,8 @@ namespace engine
 		gui::Window* getWindow();
 
 		IRenderer& getRenderer();
-		sgl::DebugRenderer& getDebugRenderer();
+
+		void setRenderer(unsigned int idx);
 
 		ResourceManager& getResources();
 
@@ -64,7 +65,8 @@ namespace engine
 
 		//
 		IRenderer* _renderer;
-		std::unique_ptr<sgl::DebugRenderer> _debugRenderer;
+
+		std::vector<IRenderer*> _renderers;
 
 		// 
 		ResourceManager _resources;
@@ -80,6 +82,8 @@ namespace engine
 		void updateChunkManagersVisibility(sgl::Frustum& frustum);
 
 		void initializeContext();
+
+		void allocateRenderers();
 	};
 }
 
