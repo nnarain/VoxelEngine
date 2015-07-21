@@ -115,7 +115,10 @@ void ScriptEngine::init()
 						value("SPACE",  GLFW_KEY_SPACE),
 						value("ENTER",  GLFW_KEY_ENTER),
 						value("LCTRL",  GLFW_KEY_LEFT_CONTROL),
-						value("LSHIFT", GLFW_KEY_LEFT_SHIFT)
+						value("LSHIFT", GLFW_KEY_LEFT_SHIFT),
+
+						value("ACTION_PRESS",   GLFW_PRESS),
+						value("ACTION_RELEASE", GLFW_RELEASE)
 					]
 			],
 
