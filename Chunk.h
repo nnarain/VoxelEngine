@@ -21,6 +21,35 @@ namespace engine
 	{
 	public:
 
+		// Structure of a block's face
+		struct Face
+		{
+			Face(Vertex& v1, Vertex& v2, Vertex& v3) : v1(v1), v2(v2), v3(v3)
+			{
+			}
+
+			Vertex v1;
+			Vertex v2;
+			Vertex v3;
+		};
+
+		// structure used for lighting
+		struct LightNode
+		{
+			LightNode(Block* block, Chunk* owner) : block(block), owner(owner)
+			{
+			}
+
+			LightNode() : LightNode(nullptr, nullptr)
+			{
+			}
+
+			Block* block;
+			Chunk* owner;
+		};
+
+		typedef std::map<Block*, LightNode> LightMap;
+
 		Chunk(int size);
 		Chunk(int size, float blockSize);
 		~Chunk();
@@ -56,6 +85,8 @@ namespace engine
 		void setUpdateCallback(std::function<void(Chunk*)> callback);
 		void markForUpdate();
 
+		LightMap& getLightSourceMap();
+
 	public:
 
 		Chunk* left;
@@ -66,33 +97,6 @@ namespace engine
 		Chunk* far;
 
 	private:
-		//
-		struct Face
-		{
-			Face(Vertex& v1, Vertex& v2, Vertex& v3) : v1(v1), v2(v2), v3(v3)
-			{
-			}
-
-			Vertex v1;
-			Vertex v2;
-			Vertex v3;
-		};
-
-		struct LightNode
-		{
-			LightNode(Block* block, Chunk* owner) : block(block), owner(owner)
-			{
-			}
-
-			LightNode() : LightNode(nullptr, nullptr)
-			{
-			}
-
-			Block* block;
-			Chunk* owner;
-		};
-
-		typedef std::map<Block*, LightNode> LightMap;
 
 		sgl::Mesh _mesh;
 
@@ -138,6 +142,7 @@ namespace engine
 
 		void removeLightSources();
 		void clearBlockLight(Block* block);
+		void clearLightNode(LightNode& node, std::queue<LightNode>& queue, std::map<Block*, int>& intensities, int intensity);
 
 		sgl::ColorRGB32f getBlockColor(Block& block, BlockFace face);
 	};

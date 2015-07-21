@@ -625,8 +625,10 @@ Chunk::LightNode Chunk::getLightNode(int x, int y, int z)
 
 void Chunk::removeLightSources()
 {
+	// store a list of chunks that need to be updated
 	ChunkSet updateSet;
 
+	// iterate over every node that needs to be removed
 	for (auto& iter : _lightRemovalList)
 	{
 		std::queue<LightNode> lightQueue;
@@ -653,7 +655,7 @@ void Chunk::removeLightSources()
 		clearBlockLight(iter.second.block);
 
 		// set the intensity value in the map
-		intensities[iter.second.block] = sourceIntensity;
+		intensities[iter.first] = sourceIntensity;
 
 		while (!lightQueue.empty())
 		{
@@ -672,67 +674,63 @@ void Chunk::removeLightSources()
 				LightNode adjacent;
 
 				adjacent = source.owner->getLightNode(x - 1, y, z);
-				if (adjacent.block != nullptr && intensities.find(adjacent.block) == intensities.end())
-				{
-					lightQueue.push(adjacent);
-					intensities[adjacent.block] = intensity - 1;
-					clearBlockLight(adjacent.block);
+				clearLightNode(adjacent, lightQueue, intensities, intensity);
+				if (adjacent.owner != nullptr)
 					updateSet.insert(adjacent.owner);
-				}
 
 				adjacent = source.owner->getLightNode(x + 1, y, z);
-				if (adjacent.block != nullptr && intensities.find(adjacent.block) == intensities.end())
-				{
-					lightQueue.push(adjacent);
-					intensities[adjacent.block] = intensity - 1;
-					clearBlockLight(adjacent.block);
+				clearLightNode(adjacent, lightQueue, intensities, intensity);
+				if (adjacent.owner != nullptr)
 					updateSet.insert(adjacent.owner);
-				}
 
 				adjacent = source.owner->getLightNode(x, y + 1, z);
-				if (adjacent.block != nullptr && intensities.find(adjacent.block) == intensities.end())
-				{
-					lightQueue.push(adjacent);
-					intensities[adjacent.block] = intensity - 1;
-					clearBlockLight(adjacent.block);
+				clearLightNode(adjacent, lightQueue, intensities, intensity);
+				if (adjacent.owner != nullptr)
 					updateSet.insert(adjacent.owner);
-				}
 
 				adjacent = source.owner->getLightNode(x, y - 1, z);
-				if (adjacent.block != nullptr && intensities.find(adjacent.block) == intensities.end())
-				{
-					lightQueue.push(adjacent);
-					intensities[adjacent.block] = intensity - 1;
-					clearBlockLight(adjacent.block);
+				clearLightNode(adjacent, lightQueue, intensities, intensity);
+				if (adjacent.owner != nullptr)
 					updateSet.insert(adjacent.owner);
-				}
 
 				adjacent = source.owner->getLightNode(x, y, z - 1);
-				if (adjacent.block != nullptr && intensities.find(adjacent.block) == intensities.end())
-				{
-					lightQueue.push(adjacent);
-					intensities[adjacent.block] = intensity - 1;
-					clearBlockLight(adjacent.block);
+				clearLightNode(adjacent, lightQueue, intensities, intensity);
+				if (adjacent.owner != nullptr)
 					updateSet.insert(adjacent.owner);
-				}
 
 				adjacent = source.owner->getLightNode(x, y, z + 1);
-				if (adjacent.block != nullptr && intensities.find(adjacent.block) == intensities.end())
-				{
-					lightQueue.push(adjacent);
-					intensities[adjacent.block] = intensity - 1;
-					clearBlockLight(adjacent.block);
+				clearLightNode(adjacent, lightQueue, intensities, intensity);
+				if (adjacent.owner != nullptr)
 					updateSet.insert(adjacent.owner);
-				}
 			}
 		}
 
-		_lightSourceList.erase(iter.second.block);
+		iter.second.owner->getLightSourceMap().erase(iter.first);
 	}
 
 	for (auto& chunk : updateSet)
-	{
 		chunk->markForUpdate();
+
+	_lightRemovalList.clear();
+}
+
+void Chunk::clearLightNode(LightNode& node, std::queue<LightNode>& queue, std::map<Block*, int>& intensities, int intensity)
+{
+	if (node.block != nullptr)
+	{
+		// if the block hasn't already been discovered
+		if (intensities.find(node.block) == intensities.end())
+		{
+			LightMap& sourceList = node.owner->getLightSourceMap();
+
+			// and the block isn't in the source list
+			if (sourceList.find(node.block) == sourceList.end())
+			{
+				queue.push(node);
+				intensities[node.block] = intensity - 1;
+				clearBlockLight(node.block);
+			}
+		}
 	}
 }
 
@@ -861,6 +859,11 @@ Sphere& Chunk::getBounds()
 void Chunk::setUpdateCallback(std::function<void(Chunk*)> callback)
 {
 	_updateCallback = callback;
+}
+
+Chunk::LightMap& Chunk::getLightSourceMap()
+{
+	return _lightSourceList;
 }
 
 void Chunk::markForUpdate()
