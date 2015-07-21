@@ -12,9 +12,11 @@ namespace sgl
 		in vec3 vPosition;
 		in vec3 vNormal;
 		in vec2 vTexCoord;
+		in vec3 vColor;
 
 		out vec3 fNormal;
 		out vec2 fTexCoord;
+		out vec3 fColor;
 
 		uniform mat4 MVP;
 		uniform mat3 N;
@@ -25,6 +27,7 @@ namespace sgl
 
 			fNormal   = N * vNormal;
 			fTexCoord = vTexCoord;
+			fColor    = vColor;
 		}
 	);
 
@@ -32,9 +35,11 @@ namespace sgl
 
 		out vec3 outNormal;
 		out vec3 outDiffuse;
+		out vec3 outColor;
 
 		in vec3 fNormal;
 		in vec2 fTexCoord;
+		in vec3 fColor;
 
 		uniform sampler2D blockTexture;
 
@@ -42,6 +47,7 @@ namespace sgl
 		{
 			outNormal  = normalize(fNormal);
 			outDiffuse = texture(blockTexture, fTexCoord).xyz;
+			outColor   = fColor;
 		}
 	);
 }

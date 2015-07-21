@@ -9,13 +9,46 @@
 #include <SGL/Math/Matrix4.h>
 
 #include <vector>
+#include <queue>
+#include <set>
+#include <map>
 #include <string>
+#include <functional>
 
 namespace engine
 {
 	class Chunk
 	{
 	public:
+
+		// Structure of a block's face
+		struct Face
+		{
+			Face(Vertex& v1, Vertex& v2, Vertex& v3) : v1(v1), v2(v2), v3(v3)
+			{
+			}
+
+			Vertex v1;
+			Vertex v2;
+			Vertex v3;
+		};
+
+		// structure used for lighting
+		struct LightNode
+		{
+			LightNode(Block* block, Chunk* owner) : block(block), owner(owner)
+			{
+			}
+
+			LightNode() : LightNode(nullptr, nullptr)
+			{
+			}
+
+			Block* block;
+			Chunk* owner;
+		};
+
+		typedef std::map<Block*, LightNode> LightMap;
 
 		Chunk(int size);
 		Chunk(int size, float blockSize);
@@ -29,6 +62,10 @@ namespace engine
 		void render();
 
 		void setBlock(int x, int y, int z, int t);
+
+		void setLightSource(int x, int y, int z, int r, int g, int b);
+
+		void removeLight(int x, int y, int z);
 
 		bool isSetup(void) const;
 
@@ -45,6 +82,11 @@ namespace engine
 
 		sgl::Sphere& getBounds();
 
+		void setUpdateCallback(std::function<void(Chunk*)> callback);
+		void markForUpdate();
+
+		LightMap& getLightSourceMap();
+
 	public:
 
 		Chunk* left;
@@ -55,17 +97,6 @@ namespace engine
 		Chunk* far;
 
 	private:
-		//
-		struct Face
-		{
-			Face(Vertex& v1, Vertex& v2, Vertex& v3) : v1(v1), v2(v2), v3(v3)
-			{
-			}
-
-			Vertex v1;
-			Vertex v2;
-			Vertex v3;
-		};
 
 		sgl::Mesh _mesh;
 
@@ -76,7 +107,12 @@ namespace engine
 		std::vector<Block> _blocks;
 		std::vector<bool> _hasLocationFlags;
 
+		LightMap _lightSourceList;
+		LightMap _lightRemovalList;
+
 		std::string _atlasName;
+
+		std::function<void(Chunk*)> _updateCallback;
 
 		int _size;
 		float _blockSize;
@@ -88,11 +124,27 @@ namespace engine
 
 		sgl::Sphere _bounds;
 
+	private:
+
 		void createCubeMesh(Block& block, bool l, bool r, bool t, bool b, bool n, bool far);
 
-		Face makeFace(Vertex& v1, Vertex& v2, Vertex& v3, Block block, bool firstHalf);
+		Face makeFace(Vertex& v1, Vertex& v2, Vertex& v3, Block block, bool firstHalf, sgl::ColorRGB32f& color);
 		sgl::Vector3 calculatePerVertexNormal(sgl::Vector3 x, sgl::Vector3 y, sgl::Vector3 z, bool adjacentX, bool adjacentY, bool adjacentZ);
 		Face textureFace(Vertex& v1, Vertex& v2, Vertex& v3, Block block, bool firstHalf);
+
+		void propagateLight();
+		bool propagateLightPerFace(LightNode& source, LightNode& block, BlockFace face);
+		bool spreadLight(LightNode& node, BlockFace face, light_t level);
+		void setLightLevel(Block* block, int r, int g, int b, BlockFace face);
+
+		LightNode getLightNode(int x, int y, int z);
+		LightNode getLightNode(Block* block, BlockFace face);
+
+		void removeLightSources();
+		void clearBlockLight(Block* block);
+		void clearLightNode(LightNode& node, std::queue<LightNode>& queue, std::map<Block*, int>& intensities, int intensity);
+
+		sgl::ColorRGB32f getBlockColor(Block& block, BlockFace face);
 	};
 }
 

@@ -13,6 +13,8 @@ Window::Window(const std::string& title, int w, int h) : _width(w), _height(h), 
 		glfwTerminate();
 		exit(1);
 	}
+
+	glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 }
 
 bool Window::shouldClose()

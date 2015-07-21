@@ -25,6 +25,9 @@ TODO
 ----
 
 - Voxel lighting
+- Light Gamma Correction
+- Multiple Renderers
+- Command Line Interface
 - Block selection
 
 

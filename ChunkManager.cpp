@@ -185,6 +185,34 @@ void ChunkManager::setBlock(int x, int y, int z, int t)
 	chunk.setBlock(blockX, blockY, blockZ, t);
 }
 
+void ChunkManager::setLightSource(int x, int y, int z, int r, int g, int b)
+{
+	int chunkX = x / _blocksPerChunk;
+	int chunkY = y / _blocksPerChunk;
+	int chunkZ = z / _blocksPerChunk;
+
+	int blockX = x % _blocksPerChunk;
+	int blockY = y % _blocksPerChunk;
+	int blockZ = z % _blocksPerChunk;
+
+	Chunk& chunk = getChunk(chunkX, chunkY, chunkZ);
+	chunk.setLightSource(blockX, blockY, blockZ, r, g, b);
+}
+
+void ChunkManager::removeLight(int x, int y, int z)
+{
+	int chunkX = x / _blocksPerChunk;
+	int chunkY = y / _blocksPerChunk;
+	int chunkZ = z / _blocksPerChunk;
+
+	int blockX = x % _blocksPerChunk;
+	int blockY = y % _blocksPerChunk;
+	int blockZ = z % _blocksPerChunk;
+
+	Chunk& chunk = getChunk(chunkX, chunkY, chunkZ);
+	chunk.removeLight(blockX, blockY, blockZ);
+}
+
 Chunk& ChunkManager::getChunk(int x, int y, int z)
 {
 	if (x < 0) x = 0;
@@ -198,6 +226,7 @@ Chunk& ChunkManager::getChunk(int x, int y, int z)
 		chunk.setLocation(x, y, z);
 		chunk.calculateBounds(_worldTransform);
 		setChunkNeighbors(chunk);
+		chunk.setUpdateCallback(std::bind(&ChunkManager::updateCallback, this, std::placeholders::_1));
 	}
 
 	return chunk;
@@ -235,6 +264,11 @@ void ChunkManager::rebuildChunks()
 	{
 		_chunkRebuildSet.erase(*rebuiltIter);
 	}
+}
+
+void ChunkManager::updateCallback(Chunk* chunk)
+{
+	_chunkRebuildSet.insert(chunk);
 }
 
 int ChunkManager::getBlockX() const

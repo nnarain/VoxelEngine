@@ -62,6 +62,12 @@ namespace engine
 		void setBlock(int x, int y, int z, int t);
 
 		/**
+		*/
+		void setLightSource(int x, int y, int z, int r, int g, int b);
+
+		void removeLight(int x, int y, int z);
+
+		/**
 		
 		*/
 		Block getBlockFromWorldPosition(const sgl::Vector3& position);
@@ -121,6 +127,8 @@ namespace engine
 
 		void allocateChunks(int chunkSize, float blockSize);
 		void setChunkNeighbors(Chunk& chunk);
+
+		void updateCallback(Chunk* chunk);
 
 	};
 }

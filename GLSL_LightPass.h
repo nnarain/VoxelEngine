@@ -27,6 +27,7 @@ namespace sgl
 
 		uniform sampler2D normalMap;
 		uniform sampler2D diffuseMap;
+		uniform sampler2D colorMap;
 
 		vec2 calcTexCoord();
 
@@ -34,8 +35,9 @@ namespace sgl
 		{
 			vec2 texCoord = calcTexCoord();
 
-			vec3 normal   = texture(normalMap,  texCoord).xyz;
-			vec3 texColor = texture(diffuseMap, texCoord).xyz;
+			vec3 normal     = texture(normalMap,  texCoord).xyz;
+			vec3 baseColor  = texture(diffuseMap, texCoord).xyz;
+			vec3 lightColor = texture(colorMap,   texCoord).xyz;
 
 			// ambient light
 			vec3 ambientColor = vec3(1, 1, 1) * 0.3;
@@ -48,10 +50,11 @@ namespace sgl
 
 			if (diffuseFactor > 0)
 			{
-				diffuseColor = vec3(1, 1, 1) * 0.5 * diffuseFactor;
+				diffuseColor = vec3(1, 1, 1) * 0.2 * diffuseFactor;
 			}
 
-			fragColor = texColor * (ambientColor + diffuseColor);
+			fragColor = (baseColor)* (ambientColor + diffuseColor + lightColor);
+			//fragColor = lightColor;
 		}
 
 		vec2 calcTexCoord()
