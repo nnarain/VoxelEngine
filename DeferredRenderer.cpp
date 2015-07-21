@@ -1,5 +1,5 @@
 
-#include "Renderer.h"
+#include "DeferredRenderer.h"
 #include "DefaultShaders.h"
 #include "GLSL_GeometryPass.h"
 #include "GLSL_LightPass.h"
@@ -16,12 +16,12 @@
 using namespace engine;
 using namespace sgl;
 
-Renderer::Renderer(void)
+DeferredRenderer::DeferredRenderer(void)
 {
 
 }
 
-void Renderer::init()
+void DeferredRenderer::init()
 {
 	try
 	{
@@ -68,7 +68,7 @@ void Renderer::init()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
-void Renderer::initScreenMesh(sgl::Mesh& mesh)
+void DeferredRenderer::initScreenMesh(sgl::Mesh& mesh)
 {
 	// float buffer with screen space coordinates of quad
 	float screenMeshBuffer[] = {
@@ -91,7 +91,7 @@ void Renderer::initScreenMesh(sgl::Mesh& mesh)
 	vbo.unbind();
 }
 
-void Renderer::begin()
+void DeferredRenderer::begin()
 {
 	// clear the back buffer
 	Context::clear(Context::BufferBits::COLOR_DEPTH);
@@ -109,7 +109,7 @@ void Renderer::begin()
 	glEnable(GL_DEPTH_TEST);
 }
 
-void Renderer::render(ChunkManager& chunkManager, Matrix4& VP)
+void DeferredRenderer::render(ChunkManager& chunkManager, Matrix4& VP)
 {
 	// get the chunkmanager transform matrix and calculate the MVP
 
@@ -130,7 +130,7 @@ void Renderer::render(ChunkManager& chunkManager, Matrix4& VP)
 	texture.unbind();
 }
 
-void Renderer::end()
+void DeferredRenderer::end()
 {
 	_geometryPass.end();
 
@@ -157,6 +157,6 @@ void Renderer::end()
 	_lightPass.end();
 }
 
-Renderer::~Renderer()
+DeferredRenderer::~DeferredRenderer()
 {
 }

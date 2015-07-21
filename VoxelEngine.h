@@ -5,7 +5,7 @@
 #include "ChunkManager.h"
 #include "FPSCamera.h"
 #include "Window.h"
-#include "Renderer.h"
+#include "DeferredRenderer.h"
 #include "ResourceManager.h"
 #include "Logger.h"
 
@@ -38,7 +38,7 @@ namespace engine
 
 		gui::Window* getWindow();
 
-		Renderer& getRenderer();
+		IRenderer& getRenderer();
 		sgl::DebugRenderer& getDebugRenderer();
 
 		ResourceManager& getResources();
@@ -63,7 +63,7 @@ namespace engine
 		std::unique_ptr<gui::Window> _window;
 
 		//
-		std::unique_ptr<Renderer> _renderer;
+		IRenderer* _renderer;
 		std::unique_ptr<sgl::DebugRenderer> _debugRenderer;
 
 		// 

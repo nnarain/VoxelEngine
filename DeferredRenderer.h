@@ -1,6 +1,6 @@
 
-#ifndef RENDERER_H
-#define RENDERER_H
+#ifndef DEFERREDRENDERER_H
+#define DEFERREDRENDERER_H
 
 #include "IRenderer.h"
 
@@ -19,12 +19,12 @@ namespace engine
 {
 	/**
 	*/
-	class Renderer : public IRenderer
+	class DeferredRenderer : public IRenderer
 	{
 	public:
 
-		Renderer(void);
-		~Renderer();
+		DeferredRenderer(void);
+		~DeferredRenderer();
 
 		void init();
 

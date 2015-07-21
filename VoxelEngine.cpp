@@ -108,7 +108,7 @@ void VoxelEngine::initializeContext()
 	glfwMakeContextCurrent(_window->getWindow());
 	sgl::init();
 
-	_renderer = std::make_unique<Renderer>();
+	_renderer = new DeferredRenderer();
 	_renderer->init();
 
 	_debugRenderer = std::make_unique<DebugRenderer>();
@@ -125,9 +125,9 @@ void VoxelEngine::loadAtlas(const char *atlasName)
 	_resources.getTextureManager().addAtlas(atlasName);
 }
 
-Renderer& VoxelEngine::getRenderer()
+IRenderer& VoxelEngine::getRenderer()
 {
-	return *(_renderer.get());
+	return *(_renderer);
 }
 
 sgl::DebugRenderer& VoxelEngine::getDebugRenderer()
@@ -163,6 +163,7 @@ VoxelEngine* VoxelEngine::getEngine()
 
 VoxelEngine::~VoxelEngine()
 {
+	delete _renderer;
 }
 
 
