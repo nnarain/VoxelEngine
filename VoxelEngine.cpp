@@ -147,6 +147,11 @@ void VoxelEngine::setRenderer(unsigned int idx)
 		_renderer->init();
 }
 
+void VoxelEngine::setRenderOption(const char *key, const char *value)
+{
+	_renderer->setRenderOption(std::string(key), std::string(value));
+}
+
 ResourceManager& VoxelEngine::getResources()
 {
 	return _resources;

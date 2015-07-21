@@ -41,6 +41,7 @@ namespace engine
 		IRenderer& getRenderer();
 
 		void setRenderer(unsigned int idx);
+		void setRenderOption(const char *key, const char *value);
 
 		ResourceManager& getResources();
 

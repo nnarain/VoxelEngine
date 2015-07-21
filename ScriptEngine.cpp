@@ -41,7 +41,9 @@ void ScriptEngine::init()
 			.def("addManager",       &VoxelEngine::addChunkManager)
 			.def("updateCameraView", &VoxelEngine::updateCamera)
 			.def("loadTexture",      &VoxelEngine::loadTexture)
-			.def("loadAtlas",        &VoxelEngine::loadAtlas),
+			.def("loadAtlas",        &VoxelEngine::loadAtlas)
+			.def("setRenderMode",    &VoxelEngine::setRenderer)
+			.def("setRenderOption",  &VoxelEngine::setRenderOption),
 
 		class_<Block>("Block")
 			.def_readonly("t", &Block::t)
