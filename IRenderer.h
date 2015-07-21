@@ -21,10 +21,7 @@ namespace engine
 		virtual void render(ChunkManager& chunkManager, sgl::Matrix4& VP) = 0;
 		virtual void end()                                                = 0;
 
-		TextureManager& getTextureManager();
-
 	protected:
-		TextureManager _textureManager;
 	};
 }
 

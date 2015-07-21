@@ -117,12 +117,12 @@ void VoxelEngine::initializeContext()
 
 void VoxelEngine::loadTexture(const char *textureName)
 {
-	_renderer->getTextureManager().addTexture(textureName);
+	_resources.getTextureManager().addTexture(textureName);
 }
 
 void VoxelEngine::loadAtlas(const char *atlasName)
 {
-	_renderer->getTextureManager().addAtlas(atlasName);
+	_resources.getTextureManager().addAtlas(atlasName);
 }
 
 Renderer& VoxelEngine::getRenderer()
@@ -133,6 +133,11 @@ Renderer& VoxelEngine::getRenderer()
 sgl::DebugRenderer& VoxelEngine::getDebugRenderer()
 {
 	return *(_debugRenderer.get());
+}
+
+ResourceManager& VoxelEngine::getResources()
+{
+	return _resources;
 }
 
 gui::Window* VoxelEngine::getWindow()

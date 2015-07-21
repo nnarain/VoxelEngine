@@ -6,6 +6,7 @@
 #include "FPSCamera.h"
 #include "Window.h"
 #include "Renderer.h"
+#include "ResourceManager.h"
 #include "Logger.h"
 
 #include <SGL/Util/DebugRenderer.h>
@@ -40,6 +41,8 @@ namespace engine
 		Renderer& getRenderer();
 		sgl::DebugRenderer& getDebugRenderer();
 
+		ResourceManager& getResources();
+
 		util::Logger& getLogger();
 
 		/**
@@ -62,6 +65,9 @@ namespace engine
 		//
 		std::unique_ptr<Renderer> _renderer;
 		std::unique_ptr<sgl::DebugRenderer> _debugRenderer;
+
+		// 
+		ResourceManager _resources;
 
 		//
 		FPSCamera _camera;

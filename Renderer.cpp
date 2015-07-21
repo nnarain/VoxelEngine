@@ -3,6 +3,7 @@
 #include "DefaultShaders.h"
 #include "GLSL_GeometryPass.h"
 #include "GLSL_LightPass.h"
+#include "VoxelEngine.h"
 
 #include "GL/glew.h"
 
@@ -119,7 +120,7 @@ void Renderer::render(ChunkManager& chunkManager, Matrix4& VP)
 	_geometryPass["MVP"].set(MVP);
 	_geometryPass["N"].set(N);
 
-	Texture& texture = _textureManager.getTexture(chunkManager.getAtlasName());
+	Texture& texture = VoxelEngine::getEngine()->getResources().getTextureManager().getTexture(chunkManager.getAtlasName());
 	texture.bind(Texture::Unit::T0);
 
 	_geometryPass["blockTexture"].set(texture);
