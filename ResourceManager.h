@@ -3,6 +3,7 @@
 #define RESOURCEMANAGER_H
 
 #include "TextureManager.h"
+#include "FontManager.h"
 
 namespace engine
 {
@@ -14,9 +15,11 @@ namespace engine
 		~ResourceManager();
 
 		TextureManager& getTextureManager();
+		FontManager&    getFontManager();
 
 	private:
 		TextureManager _textureManager;
+		FontManager    _fontManager;
 	};
 }
 

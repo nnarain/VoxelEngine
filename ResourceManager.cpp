@@ -12,6 +12,11 @@ TextureManager& ResourceManager::getTextureManager()
 	return _textureManager;
 }
 
+FontManager& ResourceManager::getFontManager()
+{
+	return _fontManager;
+}
+
 ResourceManager::~ResourceManager()
 {
 }

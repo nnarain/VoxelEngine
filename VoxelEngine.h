@@ -33,6 +33,7 @@ namespace engine
 
 		void loadTexture(const char *textureName);
 		void loadAtlas(const char *atlasName);
+		void loadFont(const char *fontname, int cols, int rows, bool flip);
 
 		FPSCamera* getCamera();
 

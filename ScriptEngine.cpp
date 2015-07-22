@@ -42,6 +42,7 @@ void ScriptEngine::init()
 			.def("updateCameraView", &VoxelEngine::updateCamera)
 			.def("loadTexture",      &VoxelEngine::loadTexture)
 			.def("loadAtlas",        &VoxelEngine::loadAtlas)
+			.def("loadFont",         &VoxelEngine::loadFont)
 			.def("setRenderMode",    &VoxelEngine::setRenderer)
 			.def("setRenderOption",  &VoxelEngine::setRenderOption),
 

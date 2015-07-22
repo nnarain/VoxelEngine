@@ -132,6 +132,11 @@ void VoxelEngine::loadAtlas(const char *atlasName)
 	_resources.getTextureManager().addAtlas(atlasName);
 }
 
+void VoxelEngine::loadFont(const char *fontname, int cols, int rows, bool flip)
+{
+	_resources.getFontManager().addFont(fontname, (unsigned int)cols, (unsigned int)rows, flip);
+}
+
 IRenderer& VoxelEngine::getRenderer()
 {
 	return *(_renderer);
