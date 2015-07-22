@@ -112,6 +112,17 @@ void ScriptEngine::init()
 						value("Y", GLFW_KEY_Y),
 						value("Z", GLFW_KEY_Z),
 
+						value("NUM_0", GLFW_KEY_0),
+						value("NUM_1", GLFW_KEY_1),
+						value("NUM_2", GLFW_KEY_2),
+						value("NUM_3", GLFW_KEY_3),
+						value("NUM_4", GLFW_KEY_4),
+						value("NUM_5", GLFW_KEY_5),
+						value("NUM_6", GLFW_KEY_6),
+						value("NUM_7", GLFW_KEY_7),
+						value("NUM_8", GLFW_KEY_8),
+						value("NUM_9", GLFW_KEY_9),
+
 						value("SPACE",  GLFW_KEY_SPACE),
 						value("ENTER",  GLFW_KEY_ENTER),
 						value("LCTRL",  GLFW_KEY_LEFT_CONTROL),
