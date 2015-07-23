@@ -76,7 +76,10 @@ void ScriptEngine::init()
 
 		class_<gui::CommandLine>("CommandLine")
 		.def(constructor<>())
-		.def("append", &gui::CommandLine::append),
+		.def("append",    &gui::CommandLine::append)
+		.def("process",   &gui::CommandLine::process)
+		.def("isActive",  &gui::CommandLine::isActive)
+		.def("setActive", &gui::CommandLine::setActive),
 
 		class_<gui::Window>("Window")
 			.def(constructor<const char*, int, int>())
@@ -132,8 +135,10 @@ void ScriptEngine::init()
 
 						value("SPACE",  GLFW_KEY_SPACE),
 						value("ENTER",  GLFW_KEY_ENTER),
+						value("DELETE", GLFW_KEY_BACKSPACE),
 						value("LCTRL",  GLFW_KEY_LEFT_CONTROL),
 						value("LSHIFT", GLFW_KEY_LEFT_SHIFT),
+						value("SLASH",  GLFW_KEY_SLASH),
 
 						value("ACTION_PRESS",   GLFW_PRESS),
 						value("ACTION_RELEASE", GLFW_RELEASE)
