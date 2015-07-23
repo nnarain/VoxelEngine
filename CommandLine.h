@@ -6,8 +6,8 @@
 #include <SGL/Graphics/Text.h>
 
 #include <string>
-
-typedef std::vector<std::string> StringList;
+#include <map>
+#include <functional>
 
 namespace engine
 {
@@ -16,10 +16,16 @@ namespace engine
 		class CommandLine
 		{
 		public:
+
+			typedef std::function<bool(std::vector<std::string>&)> CommandFunc;
+			typedef std::vector<std::string> StringList;
+
 			CommandLine();
 			~CommandLine();
 
 			void init();
+
+			void addCommand(const std::string& name, const CommandFunc& func);
 
 			void process(int keycode);
 
@@ -37,13 +43,15 @@ namespace engine
 			sgl::Text _text;
 			std::string _buffer;
 
+			// command map
+			std::map<std::string, CommandFunc> _commands;
+
 			bool _isActive;
 
 		private:
 
 			void dispatch();
 
-			void setRenderMode(StringList& args);
 			void setRenderOptions(StringList& args);
 
 			void push(const char *str);

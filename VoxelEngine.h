@@ -91,6 +91,8 @@ namespace engine
 		void initializeContext();
 
 		void allocateRenderers();
+
+		void addCommandLineFunctions();
 	};
 }
 

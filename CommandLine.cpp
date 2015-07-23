@@ -21,6 +21,11 @@ namespace engine
 			_text.setDimensions(20, 20);
 		}
 
+		void CommandLine::addCommand(const std::string& name, const CommandFunc& func)
+		{
+			_commands[name] = func;
+		}
+
 		void CommandLine::dispatch()
 		{
 			// break the input string into tokens
@@ -33,14 +38,10 @@ namespace engine
 			// get command arguments
 			StringList args(tokens.begin() + 1, tokens.end());
 
-			//
-			if (cmd == "SETRENDERMODE")
+			// get the command if it exists
+			if (_commands.find(cmd) != _commands.end())
 			{
-				setRenderMode(args);
-			}
-			else if (cmd == "SETRENDEROPTION")
-			{
-				setRenderOptions(args);
+				_commands[cmd](args);
 			}
 
 			// clear text
@@ -50,29 +51,9 @@ namespace engine
 			setActive(false);
 		}
 
-		void CommandLine::setRenderMode(StringList& args)
-		{
-			if (args.size() < 1) return;
-
-			std::istringstream buffer(args[0]);
-
-			int mode;
-			buffer >> mode;
-
-			VoxelEngine::getEngine()->setRenderer(mode);
-		}
-
 		void CommandLine::setRenderOptions(StringList& args)
 		{
-			if (args.size() < 2) return;
 
-			std::string key   = args[0];
-			std::string value = args[1];
-
-			std::transform(key.begin(), key.end(), key.begin(), tolower);
-			std::transform(value.begin(), value.end(), value.begin(), tolower);
-
-			VoxelEngine::getEngine()->setRenderOption(key.c_str(), value.c_str());
 		}
 
 		void CommandLine::process(int keycode)

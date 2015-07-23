@@ -2,6 +2,7 @@
 #include "VoxelEngine.h"
 #include "DeferredRenderer.h"
 #include "DebugDeferredRenderer.h"
+#include "CommandLine.h"
 
 #include <SGL/SGL.h>
 #include <SGL/Util/Context.h>
@@ -130,6 +131,47 @@ void VoxelEngine::initializeContext()
 
 	// set to the default renderer
 	setRenderer(0);
+
+	// the functions to the command line interface
+	addCommandLineFunctions();
+}
+
+void VoxelEngine::addCommandLineFunctions()
+{
+	gui::CommandLine& commandLine = *_window->getCommandLine();
+
+	commandLine.addCommand("SETRENDERMODE",
+		[](gui::CommandLine::StringList& args)
+		{
+			if (args.size() < 1) return false;
+
+			std::istringstream buffer(args[0]);
+
+			int mode;
+			buffer >> mode;
+
+			VoxelEngine::getEngine()->setRenderer(mode);
+
+			return true;
+		}
+	);
+
+	commandLine.addCommand("SETRENDEROPTION",
+		[](gui::CommandLine::StringList& args)
+		{
+			if (args.size() < 2) return false;
+
+			std::string key = args[0];
+			std::string value = args[1];
+
+			std::transform(key.begin(), key.end(), key.begin(), tolower);
+			std::transform(value.begin(), value.end(), value.begin(), tolower);
+
+			VoxelEngine::getEngine()->setRenderOption(key.c_str(), value.c_str());
+
+			return true;
+		}
+	);
 }
 
 void VoxelEngine::allocateRenderers()
