@@ -49,6 +49,12 @@ void VoxelEngine::render()
 		}
 	}
 	_renderer->end();
+
+	_textRenderer->begin();
+	{
+		_textRenderer->draw(_window->getCommandLine()->getText(), true, false);
+	}
+	_textRenderer->end();
 }
 
 void VoxelEngine::addChunkManager(ChunkManager* manager)
@@ -103,6 +109,16 @@ void VoxelEngine::createWindow(const char * title, int width, int height)
 
 	// initialize the opengl context
 	initializeContext();
+
+	// load default resources
+	_resources.getFontManager().addFont("resources/DefaultFont.DDS", 16, 8, false);
+
+	//
+	_window->init();
+
+	// initialize the text renderer
+	_textRenderer = std::make_unique<TextRenderer>();
+	_textRenderer->init();
 }
 
 void VoxelEngine::initializeContext()
@@ -113,7 +129,7 @@ void VoxelEngine::initializeContext()
 	allocateRenderers();
 
 	// set to the default renderer
-	setRenderer(1);
+	setRenderer(0);
 }
 
 void VoxelEngine::allocateRenderers()

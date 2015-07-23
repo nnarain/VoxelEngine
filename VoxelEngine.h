@@ -7,9 +7,11 @@
 #include "Window.h"
 #include "IRenderer.h"
 #include "ResourceManager.h"
+#include "TextRenderer.h"
 #include "Logger.h"
 
 #include <SGL/Util/DebugRenderer.h>
+#include <SGL/Graphics/SpriteBatch.h>
 
 #include <set>
 #include <memory>
@@ -75,6 +77,9 @@ namespace engine
 
 		//
 		FPSCamera _camera;
+
+		//
+		std::unique_ptr<TextRenderer> _textRenderer;
 
 		//
 		util::Logger _logger;

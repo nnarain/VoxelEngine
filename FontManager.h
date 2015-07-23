@@ -18,6 +18,8 @@ namespace engine
 
 		void addFont(const char* filename, unsigned int cols, unsigned int rows, bool flip);
 
+		sgl::BitmapFont& getFont(const std::string &name);
+
 	private:
 
 		typedef std::map<std::string, sgl::BitmapFont*> FontMap;

@@ -18,6 +18,10 @@ namespace engine
 			CommandLine();
 			~CommandLine();
 
+			void init();
+
+			void append(const char *str);
+
 			sgl::Text& getText();
 
 		private:

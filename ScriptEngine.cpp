@@ -7,6 +7,7 @@
 #include "Timer.h"
 #include "Noise.h"
 #include "FPSCamera.h"
+#include "CommandLine.h"
 
 #include <SGL/Math/Vector3.h>
 
@@ -73,6 +74,10 @@ void ScriptEngine::init()
 			.def_readwrite("direction", &FPSCamera::direction)
 			.def_readwrite("right",     &FPSCamera::right),
 
+		class_<gui::CommandLine>("CommandLine")
+		.def(constructor<>())
+		.def("append", &gui::CommandLine::append),
+
 		class_<gui::Window>("Window")
 			.def(constructor<const char*, int, int>())
 			.def("shouldClose",      &gui::Window::shouldClose)
@@ -81,6 +86,7 @@ void ScriptEngine::init()
 			.def("setMousePosition", &gui::Window::setMousePosition)
 			.def("isKeyPressed",     &gui::Window::isKeyPressed)
 			.def("isKeyReleased",    &gui::Window::isKeyReleased)
+			.def("getCommandLine",   &gui::Window::getCommandLine)
 			
 			// key constants
 			.scope[

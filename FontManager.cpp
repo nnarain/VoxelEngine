@@ -21,6 +21,11 @@ namespace engine
 		_fontMap[name] = font;
 	}
 
+	BitmapFont& FontManager::getFont(const std::string &name)
+	{
+		return *_fontMap[name];
+	}
+
 	FontManager::~FontManager()
 	{
 		// delete the font objects
