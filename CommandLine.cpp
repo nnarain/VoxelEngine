@@ -51,13 +51,10 @@ namespace engine
 			setActive(false);
 		}
 
-		void CommandLine::setRenderOptions(StringList& args)
-		{
-
-		}
-
 		void CommandLine::process(int keycode)
 		{	
+			static int caseOffset = (int)'a' - (int)'A';
+
 			switch (keycode)
 			{
 			case GLFW_KEY_ENTER:
@@ -67,6 +64,10 @@ namespace engine
 			case GLFW_KEY_BACKSPACE:
 				_buffer.pop_back();
 				_text.removeBack();
+				break;
+
+			case GLFW_KEY_LEFT_SHIFT:
+			case GLFW_KEY_RIGHT_SHIFT:
 				break;
 
 			default:

@@ -28,8 +28,6 @@ namespace engine
 			Window(const std::string& title, int w, int h);
 			~Window();
 
-			void init();
-
 			bool shouldClose();
 			void pollEvents();
 
@@ -46,16 +44,11 @@ namespace engine
 			int getWidth();
 			int getHeight();
 
-			CommandLine* getCommandLine();
-
 		private:
 
 			GLFWwindow* _window;
 			int _width;
 			int _height;
-
-			CommandLine _commandLine;
-
 		};
 	}
 }

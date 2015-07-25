@@ -45,7 +45,8 @@ void ScriptEngine::init()
 			.def("loadAtlas",        &VoxelEngine::loadAtlas)
 			.def("loadFont",         &VoxelEngine::loadFont)
 			.def("setRenderMode",    &VoxelEngine::setRenderer)
-			.def("setRenderOption",  &VoxelEngine::setRenderOption),
+			.def("setRenderOption",  &VoxelEngine::setRenderOption)
+			.def("getCommandLine",   &VoxelEngine::getCommandLine),
 
 		class_<Block>("Block")
 			.def_readonly("t", &Block::t)
@@ -75,11 +76,11 @@ void ScriptEngine::init()
 			.def_readwrite("right",     &FPSCamera::right),
 
 		class_<gui::CommandLine>("CommandLine")
-		.def(constructor<>())
-		.def("append",    &gui::CommandLine::append)
-		.def("process",   &gui::CommandLine::process)
-		.def("isActive",  &gui::CommandLine::isActive)
-		.def("setActive", &gui::CommandLine::setActive),
+			.def(constructor<>())
+			.def("append",    &gui::CommandLine::append)
+			.def("process",   &gui::CommandLine::process)
+			.def("isActive",  &gui::CommandLine::isActive)
+			.def("setActive", &gui::CommandLine::setActive),
 
 		class_<gui::Window>("Window")
 			.def(constructor<const char*, int, int>())
@@ -89,7 +90,6 @@ void ScriptEngine::init()
 			.def("setMousePosition", &gui::Window::setMousePosition)
 			.def("isKeyPressed",     &gui::Window::isKeyPressed)
 			.def("isKeyReleased",    &gui::Window::isKeyReleased)
-			.def("getCommandLine",   &gui::Window::getCommandLine)
 			
 			// key constants
 			.scope[

@@ -53,7 +53,7 @@ void VoxelEngine::render()
 
 	_textRenderer->begin();
 	{
-		_textRenderer->draw(_window->getCommandLine()->getText(), true, false);
+		_textRenderer->draw(_commandLine->getText(), true, false);
 	}
 	_textRenderer->end();
 }
@@ -114,8 +114,12 @@ void VoxelEngine::createWindow(const char * title, int width, int height)
 	// load default resources
 	_resources.getFontManager().addFont("resources/DefaultFont.DDS", 16, 8, false);
 
-	//
-	_window->init();
+	// initialize the command line
+	_commandLine = std::make_unique<gui::CommandLine>();
+	_commandLine->init();
+
+	// the functions to the command line interface
+	addCommandLineFunctions();
 
 	// initialize the text renderer
 	_textRenderer = std::make_unique<TextRenderer>();
@@ -131,16 +135,13 @@ void VoxelEngine::initializeContext()
 
 	// set to the default renderer
 	setRenderer(0);
-
-	// the functions to the command line interface
-	addCommandLineFunctions();
 }
 
 void VoxelEngine::addCommandLineFunctions()
 {
-	gui::CommandLine& commandLine = *_window->getCommandLine();
+//	gui::CommandLine& commandLine = *_window->getCommandLine();
 
-	commandLine.addCommand("SETRENDERMODE",
+	_commandLine->addCommand("SETRENDERMODE",
 		[](gui::CommandLine::StringList& args)
 		{
 			if (args.size() < 1) return false;
@@ -156,7 +157,7 @@ void VoxelEngine::addCommandLineFunctions()
 		}
 	);
 
-	commandLine.addCommand("SETRENDEROPTION",
+	_commandLine->addCommand("SETRENDEROPTION",
 		[](gui::CommandLine::StringList& args)
 		{
 			if (args.size() < 2) return false;
@@ -233,6 +234,11 @@ FPSCamera* VoxelEngine::getCamera()
 util::Logger& VoxelEngine::getLogger()
 {
 	return _logger;
+}
+
+gui::CommandLine* VoxelEngine::getCommandLine()
+{
+	return _commandLine.get();
 }
 
 VoxelEngine* VoxelEngine::getEngine()

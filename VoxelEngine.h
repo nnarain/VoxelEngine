@@ -50,6 +50,8 @@ namespace engine
 
 		util::Logger& getLogger();
 
+		gui::CommandLine* getCommandLine();
+
 		/**
 			Return the instance of the voxel engine
 		*/
@@ -77,6 +79,9 @@ namespace engine
 
 		//
 		FPSCamera _camera;
+
+		//
+		std::unique_ptr<gui::CommandLine> _commandLine;
 
 		//
 		std::unique_ptr<TextRenderer> _textRenderer;

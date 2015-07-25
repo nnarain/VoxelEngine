@@ -52,8 +52,6 @@ namespace engine
 
 			void dispatch();
 
-			void setRenderOptions(StringList& args);
-
 			void push(const char *str);
 
 			void tokenize(StringList& v, std::string &s, const std::string &delimiter);

@@ -18,11 +18,6 @@ namespace engine
 			glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 		}
 
-		void Window::init()
-		{
-			_commandLine.init();
-		}
-
 		bool Window::shouldClose()
 		{
 			return glfwWindowShouldClose(_window) > 0;
@@ -76,11 +71,6 @@ namespace engine
 		int Window::getHeight()
 		{
 			return _height;
-		}
-
-		CommandLine* Window::getCommandLine()
-		{
-			return &_commandLine;
 		}
 
 		Window::~Window()
