@@ -7,6 +7,7 @@
 #include "Timer.h"
 #include "Noise.h"
 #include "FPSCamera.h"
+#include "CommandLine.h"
 
 #include <SGL/Math/Vector3.h>
 
@@ -42,8 +43,10 @@ void ScriptEngine::init()
 			.def("updateCameraView", &VoxelEngine::updateCamera)
 			.def("loadTexture",      &VoxelEngine::loadTexture)
 			.def("loadAtlas",        &VoxelEngine::loadAtlas)
+			.def("loadFont",         &VoxelEngine::loadFont)
 			.def("setRenderMode",    &VoxelEngine::setRenderer)
-			.def("setRenderOption",  &VoxelEngine::setRenderOption),
+			.def("setRenderOption",  &VoxelEngine::setRenderOption)
+			.def("getCommandLine",   &VoxelEngine::getCommandLine),
 
 		class_<Block>("Block")
 			.def_readonly("t", &Block::t)
@@ -71,6 +74,13 @@ void ScriptEngine::init()
 			.def_readwrite("position",  &FPSCamera::position)
 			.def_readwrite("direction", &FPSCamera::direction)
 			.def_readwrite("right",     &FPSCamera::right),
+
+		class_<gui::CommandLine>("CommandLine")
+			.def(constructor<>())
+			.def("append",    &gui::CommandLine::append)
+			.def("process",   &gui::CommandLine::process)
+			.def("isActive",  &gui::CommandLine::isActive)
+			.def("setActive", &gui::CommandLine::setActive),
 
 		class_<gui::Window>("Window")
 			.def(constructor<const char*, int, int>())
@@ -125,8 +135,10 @@ void ScriptEngine::init()
 
 						value("SPACE",  GLFW_KEY_SPACE),
 						value("ENTER",  GLFW_KEY_ENTER),
+						value("DELETE", GLFW_KEY_BACKSPACE),
 						value("LCTRL",  GLFW_KEY_LEFT_CONTROL),
 						value("LSHIFT", GLFW_KEY_LEFT_SHIFT),
+						value("SLASH",  GLFW_KEY_SLASH),
 
 						value("ACTION_PRESS",   GLFW_PRESS),
 						value("ACTION_RELEASE", GLFW_RELEASE)

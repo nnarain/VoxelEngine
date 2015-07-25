@@ -47,7 +47,6 @@ namespace engine
 			GLFWwindow* _window;
 			int _width;
 			int _height;
-
 		};
 	}
 }

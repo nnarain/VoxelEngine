@@ -2,6 +2,7 @@
 #include "VoxelEngine.h"
 #include "DeferredRenderer.h"
 #include "DebugDeferredRenderer.h"
+#include "CommandLine.h"
 
 #include <SGL/SGL.h>
 #include <SGL/Util/Context.h>
@@ -49,6 +50,12 @@ void VoxelEngine::render()
 		}
 	}
 	_renderer->end();
+
+	_textRenderer->begin();
+	{
+		_textRenderer->draw(_commandLine->getText(), true, false);
+	}
+	_textRenderer->end();
 }
 
 void VoxelEngine::addChunkManager(ChunkManager* manager)
@@ -103,6 +110,20 @@ void VoxelEngine::createWindow(const char * title, int width, int height)
 
 	// initialize the opengl context
 	initializeContext();
+
+	// load default resources
+	_resources.getFontManager().addFont("resources/DefaultFont.DDS", 16, 8, false);
+
+	// initialize the command line
+	_commandLine = std::make_unique<gui::CommandLine>();
+	_commandLine->init();
+
+	// the functions to the command line interface
+	addCommandLineFunctions();
+
+	// initialize the text renderer
+	_textRenderer = std::make_unique<TextRenderer>();
+	_textRenderer->init();
 }
 
 void VoxelEngine::initializeContext()
@@ -113,7 +134,43 @@ void VoxelEngine::initializeContext()
 	allocateRenderers();
 
 	// set to the default renderer
-	setRenderer(1);
+	setRenderer(0);
+}
+
+void VoxelEngine::addCommandLineFunctions()
+{
+	_commandLine->addCommand("setrendermode",
+		[](gui::CommandLine::StringList& args)
+		{
+			if (args.size() < 1) return false;
+
+			std::istringstream buffer(args[0]);
+
+			int mode;
+			buffer >> mode;
+
+			VoxelEngine::getEngine()->setRenderer(mode);
+
+			return true;
+		}
+	);
+
+	_commandLine->addCommand("setrenderoption",
+		[](gui::CommandLine::StringList& args)
+		{
+			if (args.size() < 2) return false;
+
+			std::string key = args[0];
+			std::string value = args[1];
+
+			std::transform(key.begin(), key.end(), key.begin(), tolower);
+			std::transform(value.begin(), value.end(), value.begin(), tolower);
+
+			VoxelEngine::getEngine()->setRenderOption(key.c_str(), value.c_str());
+
+			return true;
+		}
+	);
 }
 
 void VoxelEngine::allocateRenderers()
@@ -130,6 +187,11 @@ void VoxelEngine::loadTexture(const char *textureName)
 void VoxelEngine::loadAtlas(const char *atlasName)
 {
 	_resources.getTextureManager().addAtlas(atlasName);
+}
+
+void VoxelEngine::loadFont(const char *fontname, int cols, int rows, bool flip)
+{
+	_resources.getFontManager().addFont(fontname, (unsigned int)cols, (unsigned int)rows, flip);
 }
 
 IRenderer& VoxelEngine::getRenderer()
@@ -170,6 +232,11 @@ FPSCamera* VoxelEngine::getCamera()
 util::Logger& VoxelEngine::getLogger()
 {
 	return _logger;
+}
+
+gui::CommandLine* VoxelEngine::getCommandLine()
+{
+	return _commandLine.get();
 }
 
 VoxelEngine* VoxelEngine::getEngine()

@@ -7,9 +7,12 @@
 #include "Window.h"
 #include "IRenderer.h"
 #include "ResourceManager.h"
+#include "TextRenderer.h"
 #include "Logger.h"
+#include "CommandLine.h"
 
 #include <SGL/Util/DebugRenderer.h>
+#include <SGL/Graphics/SpriteBatch.h>
 
 #include <set>
 #include <memory>
@@ -33,6 +36,7 @@ namespace engine
 
 		void loadTexture(const char *textureName);
 		void loadAtlas(const char *atlasName);
+		void loadFont(const char *fontname, int cols, int rows, bool flip);
 
 		FPSCamera* getCamera();
 
@@ -46,6 +50,8 @@ namespace engine
 		ResourceManager& getResources();
 
 		util::Logger& getLogger();
+
+		gui::CommandLine* getCommandLine();
 
 		/**
 			Return the instance of the voxel engine
@@ -76,6 +82,12 @@ namespace engine
 		FPSCamera _camera;
 
 		//
+		std::unique_ptr<gui::CommandLine> _commandLine;
+
+		//
+		std::unique_ptr<TextRenderer> _textRenderer;
+
+		//
 		util::Logger _logger;
 
 	private:
@@ -85,6 +97,8 @@ namespace engine
 		void initializeContext();
 
 		void allocateRenderers();
+
+		void addCommandLineFunctions();
 	};
 }
 
