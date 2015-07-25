@@ -9,6 +9,7 @@
 #include "ResourceManager.h"
 #include "TextRenderer.h"
 #include "Logger.h"
+#include "CommandLine.h"
 
 #include <SGL/Util/DebugRenderer.h>
 #include <SGL/Graphics/SpriteBatch.h>

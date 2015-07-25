@@ -54,6 +54,8 @@ namespace engine
 
 			void push(const char *str);
 
+			void removeBack();
+
 			void tokenize(StringList& v, std::string &s, const std::string &delimiter);
 		};
 	}

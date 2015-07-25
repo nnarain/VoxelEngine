@@ -1,6 +1,7 @@
 
 #include "CommandLine.h"
 #include "VoxelEngine.h"
+#include "Window.h"
 
 #include <glfw/glfw3.h>
 
@@ -55,6 +56,8 @@ namespace engine
 		{	
 			static int caseOffset = (int)'a' - (int)'A';
 
+			gui::Window& window = *VoxelEngine::getEngine()->getWindow();
+
 			switch (keycode)
 			{
 			case GLFW_KEY_ENTER:
@@ -62,17 +65,30 @@ namespace engine
 				break;
 
 			case GLFW_KEY_BACKSPACE:
-				_buffer.pop_back();
-				_text.removeBack();
-				break;
-
-			case GLFW_KEY_LEFT_SHIFT:
-			case GLFW_KEY_RIGHT_SHIFT:
+				removeBack();
 				break;
 
 			default:
-				std::string str = {(char)keycode};
-				push(str.c_str());
+
+				char c = keycode;
+
+				// only accept letters, numbers and spaces
+				if (keycode >= (int)'A' && keycode <= (int)'Z')
+				{
+					if (!window.isKeyPressed(GLFW_KEY_LEFT_SHIFT) && !window.isKeyPressed(GLFW_KEY_RIGHT_SHIFT))
+						c = keycode + caseOffset;
+					else
+						c = keycode;
+
+					std::string str = { (char)c };
+					push(str.c_str());
+				}
+				else if (keycode >= (int)'0' && keycode <= (int)'9' || keycode == ' ' || keycode == '-')
+				{
+					std::string str = { (char)c };
+					push(str.c_str());
+				}
+
 				break;
 			}
 		}
@@ -86,6 +102,15 @@ namespace engine
 		{
 			_text << str;
 			_buffer.push_back(*str);
+		}
+
+		void CommandLine::removeBack()
+		{
+			if (_buffer.size() > 0)
+			{
+				_buffer.pop_back();
+				_text.removeBack();
+			}
 		}
 
 		void CommandLine::clear()

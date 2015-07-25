@@ -5,8 +5,6 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#include "CommandLine.h"
-
 #include <SGL/Math/Vector2.h>
 
 #include <string>

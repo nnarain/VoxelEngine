@@ -141,7 +141,7 @@ void VoxelEngine::addCommandLineFunctions()
 {
 //	gui::CommandLine& commandLine = *_window->getCommandLine();
 
-	_commandLine->addCommand("SETRENDERMODE",
+	_commandLine->addCommand("setrendermode",
 		[](gui::CommandLine::StringList& args)
 		{
 			if (args.size() < 1) return false;
@@ -157,7 +157,7 @@ void VoxelEngine::addCommandLineFunctions()
 		}
 	);
 
-	_commandLine->addCommand("SETRENDEROPTION",
+	_commandLine->addCommand("setrenderoption",
 		[](gui::CommandLine::StringList& args)
 		{
 			if (args.size() < 2) return false;
