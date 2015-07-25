@@ -139,8 +139,6 @@ void VoxelEngine::initializeContext()
 
 void VoxelEngine::addCommandLineFunctions()
 {
-//	gui::CommandLine& commandLine = *_window->getCommandLine();
-
 	_commandLine->addCommand("setrendermode",
 		[](gui::CommandLine::StringList& args)
 		{
