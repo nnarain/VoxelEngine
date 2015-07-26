@@ -20,12 +20,16 @@ Building
 
 CmakeList.txt will be added soon.
 
+Blog Posts
+----------
+
+- [Intro to my Voxel Engine](http://nnarain.github.io/2015/06/26/Intro%20to%20my%20Voxel%20Engine.html)
 
 TODO
 ----
 
 - Voxel lighting
+- Light Gamma Correction
+- Multiple Renderers
+- Command Line Interface
 - Block selection
-
-
-	

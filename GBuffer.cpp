@@ -4,7 +4,10 @@
 using namespace engine;
 using namespace sgl;
 
-GBuffer::GBuffer() : _normalTexture(Texture::Target::TEXTURE2D), _diffuseTexture(Texture::Target::TEXTURE2D)
+GBuffer::GBuffer() : 
+	_normalTexture(Texture::Target::TEXTURE2D),
+	_diffuseTexture(Texture::Target::TEXTURE2D),
+	_colorTexture(Texture::Target::TEXTURE2D)
 {
 }
 
@@ -19,6 +22,7 @@ void GBuffer::bindForReading()
 
 	_normalTexture.bind(Texture::Unit::T0);
 	_diffuseTexture.bind(Texture::Unit::T1);
+	_colorTexture.bind(Texture::Unit::T2);
 }
 
 void GBuffer::unbind()
@@ -30,6 +34,7 @@ void GBuffer::init(int width, int height)
 {
 	initTexture(_normalTexture, width, height);
 	initTexture(_diffuseTexture, width, height);
+	initTexture(_colorTexture, width, height);
 
 	// init the depth buffer
 	_depthBuffer.bind();
@@ -44,12 +49,18 @@ void GBuffer::init(int width, int height)
 	// add multiple render targets
 	_fbo.addMRT(_normalTexture);
 	_fbo.addMRT(_diffuseTexture);
+	_fbo.addMRT(_colorTexture);
 	_fbo.setMRTBuffers();
 
 	// check
 	_fbo.checkError();
 
 	_fbo.unbind();
+
+	// add the textures to the map
+	_textureMap["normal-map"]  = &_normalTexture;
+	_textureMap["diffuse-map"] = &_diffuseTexture;
+	_textureMap["color-map"]   = &_colorTexture;
 }
 
 Texture& GBuffer::getNormalTexture()
@@ -60,6 +71,11 @@ Texture& GBuffer::getNormalTexture()
 Texture& GBuffer::getDiffuseTexture()
 {
 	return _diffuseTexture;
+}
+
+Texture& GBuffer::getColorTexture()
+{
+	return _colorTexture;
 }
 
 void GBuffer::initTexture(sgl::Texture& texture, int width, int height)
@@ -80,6 +96,11 @@ void GBuffer::initTexture(sgl::Texture& texture, int width, int height)
 	texture.parameter(Texture::ParamName::MIN_FILTER, Texture::Param::LINEAR);
 
 	texture.unbind();
+}
+
+Texture& GBuffer::getTexture(const std::string& key)
+{
+	return *(_textureMap[key]);
 }
 
 GBuffer::~GBuffer()

@@ -6,6 +6,9 @@
 #include <SGL/GL/Texture.h>
 #include <SGL/GL/RenderBuffer.h>
 
+#include <map>
+#include <string>
+
 namespace engine
 {
 	class GBuffer
@@ -24,14 +27,20 @@ namespace engine
 
 		sgl::Texture& getNormalTexture();
 		sgl::Texture& getDiffuseTexture();
+		sgl::Texture& getColorTexture();
+
+		sgl::Texture& getTexture(const std::string& key);
 
 	private:
 		sgl::FrameBuffer _fbo;
 
 		sgl::Texture _normalTexture;
 		sgl::Texture _diffuseTexture;
+		sgl::Texture _colorTexture;
 
 		sgl::RenderBuffer _depthBuffer;
+
+		std::map<std::string, sgl::Texture*> _textureMap;
 
 	private:
 

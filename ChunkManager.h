@@ -40,10 +40,24 @@ namespace engine
 		*/
 		void update();
 
+		/**
+			get the list of chunks in visible range of the camera frustum
+		*/
 		void updateVisiblityList(sgl::Frustum& frustum);
 
+		/**
+			translate this grid
+		*/
 		void translate(float x, float y, float z);
+
+		/**
+			rotate this grid
+		*/
 		void rotate(float x, float y, float z);
+
+		/**
+			scale this block
+		*/
 		void scale(float s);
 
 		/**
@@ -62,7 +76,16 @@ namespace engine
 		void setBlock(int x, int y, int z, int t);
 
 		/**
-		
+		*/
+		void setLightSource(int x, int y, int z, int r, int g, int b);
+
+		/**
+			remove light source at location (x, y, z)
+		*/
+		void removeLight(int x, int y, int z);
+
+		/**
+			Get the block from the specified position
 		*/
 		Block getBlockFromWorldPosition(const sgl::Vector3& position);
 
@@ -120,6 +143,9 @@ namespace engine
 		void updateChunkVolumes();
 
 		void allocateChunks(int chunkSize, float blockSize);
+		void setChunkNeighbors(Chunk& chunk);
+
+		void updateCallback(Chunk* chunk);
 
 	};
 }

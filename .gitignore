@@ -6,6 +6,9 @@
 Debug/
 assets/
 
+# config file
+config.json
+
 *.o
 *.obj
 *.exe

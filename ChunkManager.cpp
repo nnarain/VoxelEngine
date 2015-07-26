@@ -168,7 +168,7 @@ Block ChunkManager::getBlock(int x, int y, int z)
 
 	Chunk& chunk = getChunk(chunkX, chunkY, chunkZ);
 
-	return chunk.getBlock(blockX, blockY, blockZ);
+	return *chunk.getBlock(blockX, blockY, blockZ);
 }
 
 void ChunkManager::setBlock(int x, int y, int z, int t)
@@ -185,6 +185,34 @@ void ChunkManager::setBlock(int x, int y, int z, int t)
 	chunk.setBlock(blockX, blockY, blockZ, t);
 }
 
+void ChunkManager::setLightSource(int x, int y, int z, int r, int g, int b)
+{
+	int chunkX = x / _blocksPerChunk;
+	int chunkY = y / _blocksPerChunk;
+	int chunkZ = z / _blocksPerChunk;
+
+	int blockX = x % _blocksPerChunk;
+	int blockY = y % _blocksPerChunk;
+	int blockZ = z % _blocksPerChunk;
+
+	Chunk& chunk = getChunk(chunkX, chunkY, chunkZ);
+	chunk.setLightSource(blockX, blockY, blockZ, r, g, b);
+}
+
+void ChunkManager::removeLight(int x, int y, int z)
+{
+	int chunkX = x / _blocksPerChunk;
+	int chunkY = y / _blocksPerChunk;
+	int chunkZ = z / _blocksPerChunk;
+
+	int blockX = x % _blocksPerChunk;
+	int blockY = y % _blocksPerChunk;
+	int blockZ = z % _blocksPerChunk;
+
+	Chunk& chunk = getChunk(chunkX, chunkY, chunkZ);
+	chunk.removeLight(blockX, blockY, blockZ);
+}
+
 Chunk& ChunkManager::getChunk(int x, int y, int z)
 {
 	if (x < 0) x = 0;
@@ -197,6 +225,8 @@ Chunk& ChunkManager::getChunk(int x, int y, int z)
 	{
 		chunk.setLocation(x, y, z);
 		chunk.calculateBounds(_worldTransform);
+		setChunkNeighbors(chunk);
+		chunk.setUpdateCallback(std::bind(&ChunkManager::updateCallback, this, std::placeholders::_1));
 	}
 
 	return chunk;
@@ -234,6 +264,11 @@ void ChunkManager::rebuildChunks()
 	{
 		_chunkRebuildSet.erase(*rebuiltIter);
 	}
+}
+
+void ChunkManager::updateCallback(Chunk* chunk)
+{
+	_chunkRebuildSet.insert(chunk);
 }
 
 int ChunkManager::getBlockX() const
@@ -296,6 +331,27 @@ void ChunkManager::allocateChunks(int chunkSize, float blockSize)
 
 		_chunks.push_back(chunk);
 	}
+}
+
+void ChunkManager::setChunkNeighbors(Chunk& chunk)
+{
+	Vector3 loc = chunk.getLocation();
+	int x = (int)loc.x;
+	int y = (int)loc.y;
+	int z = (int)loc.z;
+
+	if (x - 1 >= 0)
+		chunk.left   = &getChunk(x - 1, y, z);
+	if (x + 1 < _size)
+		chunk.right  = &getChunk(x + 1, y, z);
+	if (y + 1 < _size)
+		chunk.top    = &getChunk(x, y + 1, z);
+	if (y - 1 >= 0)
+		chunk.bottom = &getChunk(x, y - 1, z);
+	if (z - 1 >= 0)
+		chunk.near   = &getChunk(x, y, z - 1);
+	if (z + 1 < _size)
+		chunk.far    = &getChunk(x, y, z + 1);
 }
 
 ChunkManager::~ChunkManager()
