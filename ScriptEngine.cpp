@@ -36,7 +36,7 @@ void ScriptEngine::init()
 			]
 			.def("update",           &VoxelEngine::update)
 			.def("render",           &VoxelEngine::render)
-			.def("createWindow",     &VoxelEngine::createWindow)
+			.def("createWindow",     &VoxelEngine::init)
 			.def("getWindow",        &VoxelEngine::getWindow)
 			.def("getCamera",        &VoxelEngine::getCamera)
 			.def("addManager",       &VoxelEngine::addChunkManager)

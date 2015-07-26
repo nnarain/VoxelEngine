@@ -7,7 +7,7 @@
 
 namespace engine
 {
-	void fatalError(const std::string& what)
+	static void fatalError(const std::string& what)
 	{
 		throw std::exception(what.c_str());
 	}

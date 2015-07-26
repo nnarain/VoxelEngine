@@ -13,6 +13,8 @@
 #include <iostream>
 #include <cassert>
 
+#include <boost/filesystem.hpp>
+
 using namespace engine;
 using namespace sgl;
 
@@ -100,7 +102,7 @@ void VoxelEngine::updateCamera(float delta)
 	}
 }
 
-void VoxelEngine::createWindow(const char * title, int width, int height)
+void VoxelEngine::init(const char * title, int width, int height)
 {
 	// create the window
 	_window = std::make_unique<gui::Window>(title, width, height);
@@ -124,6 +126,10 @@ void VoxelEngine::createWindow(const char * title, int width, int height)
 	// initialize the text renderer
 	_textRenderer = std::make_unique<TextRenderer>();
 	_textRenderer->init();
+
+	// load optional config file
+	if (boost::filesystem::exists("config.json"))
+		_config.load("config.json");
 }
 
 void VoxelEngine::initializeContext()
@@ -237,6 +243,11 @@ util::Logger& VoxelEngine::getLogger()
 gui::CommandLine* VoxelEngine::getCommandLine()
 {
 	return _commandLine.get();
+}
+
+ConfigReader& VoxelEngine::getConfig()
+{
+	return _config;
 }
 
 VoxelEngine* VoxelEngine::getEngine()
