@@ -13,6 +13,9 @@
 
 namespace engine
 {
+	/**
+		Interface for rendering chunk managers
+	*/
 	class IRenderer
 	{
 	public:

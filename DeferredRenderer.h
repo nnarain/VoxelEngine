@@ -18,6 +18,7 @@
 namespace engine
 {
 	/**
+		The main shader for the voxel engine
 	*/
 	class DeferredRenderer : public IRenderer
 	{

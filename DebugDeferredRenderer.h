@@ -14,6 +14,9 @@
 
 namespace engine
 {
+	/**
+		Shader to select which textures from the GBuffer to display
+	*/
 	class DebugDeferredRenderer : public IRenderer
 	{
 	public:

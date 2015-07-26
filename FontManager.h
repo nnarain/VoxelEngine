@@ -9,6 +9,9 @@
 
 namespace engine
 {
+	/**
+		Load and Access BitmapFonts
+	*/
 	class FontManager
 	{
 	public:

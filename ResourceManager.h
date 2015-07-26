@@ -9,6 +9,9 @@
 
 namespace engine
 {
+	/**
+		Manager all resources of the engine
+	*/
 	class ResourceManager
 	{
 	public:

@@ -8,6 +8,9 @@ namespace engine
 {
 	namespace noise
 	{
+		/**
+			Random value noise class
+		*/
 		class Noise
 		{
 		public:

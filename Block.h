@@ -8,26 +8,35 @@
 
 #include <cstdint>
 
-#define R_MASK 0x000F
-#define G_MASK 0x00F0
-#define B_MASK 0x0F00
-#define A_MASK 0xF000
+#define R_MASK 0x000F    // mask for light R channel
+#define G_MASK 0x00F0    // mask for light G channel
+#define B_MASK 0x0F00    // mask for light B channel
 
-#define CHNL_MASK 0x000F
-#define CHNL_BITS 4
+#define CHNL_MASK 0x000F // mask for a single channel of light
+#define CHNL_BITS 4      // bits per channel
 
+// get the R channel value
 #define GET_LIGHT_LEVEL_R(light) ((light & R_MASK))
+// get the G channel value
 #define GET_LIGHT_LEVEL_G(light) ((light & G_MASK) >> CHNL_BITS )
+// get the B channel value
 #define GET_LIGHT_LEVEL_B(light) ((light & B_MASK) >> (CHNL_BITS * 2) )
-#define GET_LIGHT_LEVEL_A(light) ((light & A_MASK) >> (CHNL_BITS * 3) )
 
+// set the R channel value
 #define SET_LIGHT_LEVEL_R(light, level) (light) = ( ( (light) & ~R_MASK ) | ((level) & CHNL_MASK) )
+// get the G channel value
 #define SET_LIGHT_LEVEL_G(light, level) (light) = ( ( (light) & ~G_MASK ) | ((level) & CHNL_MASK) << (CHNL_BITS) )
+// get the B channel value
 #define SET_LIGHT_LEVEL_B(light, level) (light) = ( ( (light) & ~B_MASK ) | ((level) & CHNL_MASK) << (CHNL_BITS * 2) )
-#define SET_LIGHT_LEVEL_A(light, level) (light) = ( ( (light) & ~A_MASK ) | ((level) & CHNL_MASK) << (CHNL_BITS * 3) )
 
+// light data type
 typedef uint16_t light_t;
 
+/**
+	A single vertex for mesh creation
+
+	Contains position, normal, texCoord and color attributes
+*/
 struct Vertex
 {
 	Vertex(sgl::Vector3& pos, sgl::Vector3& n, sgl::ColorRGB32f c) : position(pos), normal(n), color(c)
@@ -64,13 +73,14 @@ struct Block
 		lights[5] = 0;
 	}
 
-	uint8_t  t;
-	uint8_t  x;
-	uint8_t  y;
-	uint8_t  z;
-	light_t lights[6];
+	uint8_t  t;        // the block type
+	uint8_t  x;        // block x value in chunk
+	uint8_t  y;        // block y value in chunk
+	uint8_t  z;        // block z value in chunk
+	light_t lights[6]; // light values for each face
 };
 
+// block face number
 enum class BlockFace
 {
 	LEFT, RIGHT,
@@ -78,11 +88,13 @@ enum class BlockFace
 	NEAR, FAR
 };
 
+// check if a block is opaque
 static bool isBlockOpaque(Block& block)
 {
 	return block.t != 0;
 }
 
+// check if the block has a light value
 static bool hasLight(Block& block)
 {
 	return (block.lights[0] | block.lights[1] | block.lights[2] | block.lights[3] | block.lights[4] | block.lights[5]) != 0;

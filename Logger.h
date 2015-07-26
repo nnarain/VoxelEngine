@@ -9,6 +9,9 @@ namespace engine
 {
 	namespace util
 	{
+		/**
+			Used for logging data to an external file
+		*/
 		class Logger
 		{
 		public:
