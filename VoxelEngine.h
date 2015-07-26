@@ -10,6 +10,7 @@
 #include "TextRenderer.h"
 #include "Logger.h"
 #include "CommandLine.h"
+#include "ConfigReader.h"
 
 #include <SGL/Util/DebugRenderer.h>
 #include <SGL/Graphics/SpriteBatch.h>
@@ -32,7 +33,7 @@ namespace engine
 
 		void updateCamera(float delta);
 
-		void createWindow(const char * title, int width, int height);
+		void init(const char * title, int width, int height);
 
 		void loadTexture(const char *textureName);
 		void loadAtlas(const char *atlasName);
@@ -52,6 +53,8 @@ namespace engine
 		util::Logger& getLogger();
 
 		gui::CommandLine* getCommandLine();
+
+		ConfigReader& getConfig();
 
 		/**
 			Return the instance of the voxel engine
@@ -86,6 +89,9 @@ namespace engine
 
 		//
 		std::unique_ptr<TextRenderer> _textRenderer;
+
+		//
+		ConfigReader _config;
 
 		//
 		util::Logger _logger;
