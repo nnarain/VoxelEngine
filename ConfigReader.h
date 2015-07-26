@@ -9,6 +9,9 @@
 
 namespace engine
 {
+	/**
+		Read a JSON configuration file
+	*/
 	class ConfigReader
 	{
 	public:
@@ -16,20 +19,29 @@ namespace engine
 		ConfigReader();
 		~ConfigReader();
 
+		/**
+			Load the config file
+		*/
 		void load(const std::string& configFileName);
 
+		/**
+			Check if a value exists under the "config" root node
+		*/
 		bool exists(const std::string& child);
 
+		/**
+			Get a generic value from the config file under the "config" root node
+		*/
 		template<typename T>
 		T getValue(const std::string& child)
 		{
 			assert(_isLoaded);
-			return _ptree.get_child("config").get<T>(child);
+			return _root.get<T>(child);
 		}
 
 	private:
 
-		boost::property_tree::ptree _ptree;
+		boost::property_tree::ptree _root;
 
 		bool _isLoaded;
 

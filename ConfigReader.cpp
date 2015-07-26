@@ -1,5 +1,6 @@
 
 #include "ConfigReader.h"
+#include "FatalError.h"
 
 #include <fstream>
 
@@ -22,14 +23,26 @@ namespace engine
 		buffer << file.rdbuf();
 
 		// parse the json file
-		boost::property_tree::read_json(buffer, _ptree);
+		boost::property_tree::ptree ptree;
+		boost::property_tree::read_json(buffer, ptree);
+
+		// check if the 'config' root node exist
+		if (ptree.count("config"))
+		{
+			_root = ptree.get_child("config");
+		}
+		else
+		{
+			fatalError("Error: config.json must contain the attribute config as the root element");
+		}
+		
 
 		_isLoaded = true;
 	}
 
 	bool ConfigReader::exists(const std::string& child)
 	{
-		return _isLoaded && _ptree.count(child) != 0;
+		return _isLoaded && _root.count(child) > 0;
 	}
 
 	ConfigReader::~ConfigReader()
