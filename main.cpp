@@ -81,7 +81,7 @@ void onKeyEvent(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
 	if (key == 256) exit(0);
 
-	g_ScriptEngine->callFunction("onKeyEvent", key);
+	g_ScriptEngine->callFunction("onKeyEvent", key, action);
 }
 
 void onMouseMove(GLFWwindow* window, double x, double y)

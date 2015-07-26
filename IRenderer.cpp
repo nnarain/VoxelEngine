@@ -3,11 +3,21 @@
 
 using namespace engine;
 
-IRenderer::IRenderer()
+IRenderer::IRenderer() : initialized(false)
 {
 }
 
-TextureManager& IRenderer::getTextureManager()
+bool IRenderer::isInitialized()
 {
-	return _textureManager;
+	return initialized;
+}
+
+void IRenderer::setRenderOption(const std::string& key, const std::string& value)
+{
+	renderOptions[key] = value;
+}
+
+std::string IRenderer::getRenderOption(const std::string& key)
+{
+	return renderOptions[key];
 }

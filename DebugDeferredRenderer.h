@@ -1,11 +1,8 @@
 
-#ifndef RENDERER_H
-#define RENDERER_H
+#ifndef DEBUGDEFERREDRENDERER_H
+#define DEBUGDEFERREDRENDERER_H
 
 #include "IRenderer.h"
-
-#include "ChunkManager.h"
-#include "TextureManager.h"
 
 #include "GBuffer.h"
 
@@ -18,13 +15,14 @@
 namespace engine
 {
 	/**
+		Shader to select which textures from the GBuffer to display
 	*/
-	class Renderer : public IRenderer
+	class DebugDeferredRenderer : public IRenderer
 	{
 	public:
 
-		Renderer(void);
-		~Renderer();
+		DebugDeferredRenderer(void);
+		~DebugDeferredRenderer();
 
 		void init();
 
@@ -33,6 +31,7 @@ namespace engine
 		void end();
 
 	private:
+
 		sgl::ShaderProgram _geometryPass;
 		sgl::ShaderProgram _lightPass;
 

@@ -1,5 +1,8 @@
 
 #include "VoxelEngine.h"
+#include "DeferredRenderer.h"
+#include "DebugDeferredRenderer.h"
+#include "CommandLine.h"
 
 #include <SGL/SGL.h>
 #include <SGL/Util/Context.h>
@@ -9,6 +12,8 @@
 
 #include <iostream>
 #include <cassert>
+
+#include <boost/filesystem.hpp>
 
 using namespace engine;
 using namespace sgl;
@@ -47,6 +52,12 @@ void VoxelEngine::render()
 		}
 	}
 	_renderer->end();
+
+	_textRenderer->begin();
+	{
+		_textRenderer->draw(_commandLine->getText(), true, false);
+	}
+	_textRenderer->end();
 }
 
 void VoxelEngine::addChunkManager(ChunkManager* manager)
@@ -91,7 +102,7 @@ void VoxelEngine::updateCamera(float delta)
 	}
 }
 
-void VoxelEngine::createWindow(const char * title, int width, int height)
+void VoxelEngine::init(const char * title, int width, int height)
 {
 	// create the window
 	_window = std::make_unique<gui::Window>(title, width, height);
@@ -101,6 +112,24 @@ void VoxelEngine::createWindow(const char * title, int width, int height)
 
 	// initialize the opengl context
 	initializeContext();
+
+	// load default resources
+	_resources.getFontManager().addFont("resources/DefaultFont.DDS", 16, 8, false);
+
+	// initialize the command line
+	_commandLine = std::make_unique<gui::CommandLine>();
+	_commandLine->init();
+
+	// the functions to the command line interface
+	addCommandLineFunctions();
+
+	// initialize the text renderer
+	_textRenderer = std::make_unique<TextRenderer>();
+	_textRenderer->init();
+
+	// load optional config file
+	if (boost::filesystem::exists("config.json"))
+		_config.load("config.json");
 }
 
 void VoxelEngine::initializeContext()
@@ -108,31 +137,92 @@ void VoxelEngine::initializeContext()
 	glfwMakeContextCurrent(_window->getWindow());
 	sgl::init();
 
-	_renderer = std::make_unique<Renderer>();
-	_renderer->init();
+	allocateRenderers();
 
-	_debugRenderer = std::make_unique<DebugRenderer>();
-	_debugRenderer->init();
+	// set to the default renderer
+	setRenderer(0);
+}
+
+void VoxelEngine::addCommandLineFunctions()
+{
+	_commandLine->addCommand("setrendermode",
+		[](gui::CommandLine::StringList& args)
+		{
+			if (args.size() < 1) return false;
+
+			std::istringstream buffer(args[0]);
+
+			int mode;
+			buffer >> mode;
+
+			VoxelEngine::getEngine()->setRenderer(mode);
+
+			return true;
+		}
+	);
+
+	_commandLine->addCommand("setrenderoption",
+		[](gui::CommandLine::StringList& args)
+		{
+			if (args.size() < 2) return false;
+
+			std::string key = args[0];
+			std::string value = args[1];
+
+			std::transform(key.begin(), key.end(), key.begin(), tolower);
+			std::transform(value.begin(), value.end(), value.begin(), tolower);
+
+			VoxelEngine::getEngine()->setRenderOption(key.c_str(), value.c_str());
+
+			return true;
+		}
+	);
+}
+
+void VoxelEngine::allocateRenderers()
+{
+	_renderers.push_back(new DeferredRenderer());
+	_renderers.push_back(new DebugDeferredRenderer());
 }
 
 void VoxelEngine::loadTexture(const char *textureName)
 {
-	_renderer->getTextureManager().addTexture(textureName);
+	_resources.getTextureManager().addTexture(textureName);
 }
 
 void VoxelEngine::loadAtlas(const char *atlasName)
 {
-	_renderer->getTextureManager().addAtlas(atlasName);
+	_resources.getTextureManager().addAtlas(atlasName);
 }
 
-Renderer& VoxelEngine::getRenderer()
+void VoxelEngine::loadFont(const char *fontname, int cols, int rows, bool flip)
 {
-	return *(_renderer.get());
+	_resources.getFontManager().addFont(fontname, (unsigned int)cols, (unsigned int)rows, flip);
 }
 
-sgl::DebugRenderer& VoxelEngine::getDebugRenderer()
+IRenderer& VoxelEngine::getRenderer()
 {
-	return *(_debugRenderer.get());
+	return *(_renderer);
+}
+
+void VoxelEngine::setRenderer(unsigned int idx)
+{
+	if (idx >= _renderers.size()) return;
+
+	_renderer = _renderers[idx];
+	
+	if (!_renderer->isInitialized())
+		_renderer->init();
+}
+
+void VoxelEngine::setRenderOption(const char *key, const char *value)
+{
+	_renderer->setRenderOption(std::string(key), std::string(value));
+}
+
+ResourceManager& VoxelEngine::getResources()
+{
+	return _resources;
 }
 
 gui::Window* VoxelEngine::getWindow()
@@ -150,6 +240,16 @@ util::Logger& VoxelEngine::getLogger()
 	return _logger;
 }
 
+gui::CommandLine* VoxelEngine::getCommandLine()
+{
+	return _commandLine.get();
+}
+
+ConfigReader& VoxelEngine::getConfig()
+{
+	return _config;
+}
+
 VoxelEngine* VoxelEngine::getEngine()
 {
 	static VoxelEngine engine;
@@ -158,6 +258,8 @@ VoxelEngine* VoxelEngine::getEngine()
 
 VoxelEngine::~VoxelEngine()
 {
+	for (IRenderer* renderer : _renderers)
+		delete renderer;
 }
 
 

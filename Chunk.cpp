@@ -339,7 +339,7 @@ Chunk::Face Chunk::makeFace(Vertex& v1, Vertex& v2, Vertex& v3, Block block, boo
 Chunk::Face Chunk::textureFace(Vertex& v1, Vertex& v2, Vertex& v3, Block block, bool firstHalf)
 {
 	// set vertex texture coordinates
-	Texture::TextureRegion region = VoxelEngine::getEngine()->getRenderer().getTextureManager().getAtlas(_atlasName).getRegion(block);
+	Texture::TextureRegion region = VoxelEngine::getEngine()->getResources().getTextureManager().getAtlas(_atlasName).getRegion(block);
 
 	if (firstHalf)
 	{
