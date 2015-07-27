@@ -24,6 +24,7 @@ Blog Posts
 ----------
 
 - [Intro to my Voxel Engine](http://nnarain.github.io/2015/06/26/Intro%20to%20my%20Voxel%20Engine.html)
+- [Voxel Lighting!](http://nnarain.github.io/2015/07/23/Voxel%20Lighting!.html)
 
 TODO
 ----
