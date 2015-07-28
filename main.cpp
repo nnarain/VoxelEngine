@@ -39,8 +39,8 @@ int main(int argc, char *argv[])
 	program_options::options_description desc("Options");
 	desc.add_options()
 		("help,h", "View command line options")
-		("script,s", program_options::value<std::string>()->default_value("main.lua"), "Specify script file to run")
-		("config,c", program_options::value<std::string>()->default_value("config.json"), "Specify engine configuration file");
+		("script,s", program_options::value<std::string>()->default_value("main.lua"), "Specify lua script file to run")
+		("config,c", program_options::value<std::string>()->default_value("config.json"), "Specify engine configuration file, in json format");
 
 	program_options::variables_map vm;
 	program_options::store(program_options::parse_command_line(argc, argv, desc), vm);
@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
 	if (filesystem::exists(config))
 		ConfigReader::getSingleton().load(config);
 	else
-		std::cout << "Error cannot load configuration file. " << config << " does not exist" << std::endl;
+		std::cout << "Error cannot load configuration file. " << config << " does not exist\nUse --help or -h for help" << std::endl;
 
 	// Initialize the scripting engine
 	ScriptEngine& scriptEngine = ScriptEngine::getSingleton();
@@ -87,6 +87,7 @@ int main(int argc, char *argv[])
 	else
 	{
 		std::cout << "Error cannot load script. " << script << " does not exist" << std::endl;
+		std::cout << "use --help or -h for help" << std::endl;
 		return 1;
 	}
 
