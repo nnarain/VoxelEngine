@@ -29,8 +29,6 @@ Blog Posts
 TODO
 ----
 
-- Voxel lighting
+- Region files. Saving Chunks to disk.
 - Light Gamma Correction
-- Multiple Renderers
-- Command Line Interface
 - Block selection
