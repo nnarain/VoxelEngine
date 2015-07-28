@@ -11,11 +11,13 @@
 #include <string>
 
 #include <boost/filesystem.hpp>
+#include <boost/program_options.hpp>
 
 #define VERSION "1.0"
 
 using namespace engine;
 using namespace engine::script;
+using namespace boost;
 
 /* Prototypes */
 
@@ -34,26 +36,30 @@ static ScriptEngine* g_ScriptEngine;
 
 int main(int argc, char *argv[])
 {
-	// check for valid number of arguments
-	if (argc < 2)
-	{
-		std::cout << "Please provide a script to run" << std::endl;
-		return -1;
-	}
+	program_options::options_description desc("Options");
+	desc.add_options()
+		("help,h", "View command line options")
+		("script,s", program_options::value<std::string>()->default_value("main.lua"), "Specify script file to run")
+		("config,c", program_options::value<std::string>()->default_value("config.json"), "Specify engine configuration file");
 
-	// init GLFW
-	if (!glfwInit())
+	program_options::variables_map vm;
+	program_options::store(program_options::parse_command_line(argc, argv, desc), vm);
+
+	std::string script = vm["script"].as<std::string>();
+	std::string config = vm["config"].as<std::string>();
+
+	// check the help options
+	if (vm.count("help"))
 	{
-		std::cout << "failed to initialize GLFW" << std::endl;
-		return -1;
+		std::cout << desc << std::endl;
+		return 0;
 	}
 
 	// load optional config file
-	if (boost::filesystem::exists("config.json"))
-		ConfigReader::getSingleton().load("config.json");
-
-	//
-	std::string scriptName = std::string(argv[1]);
+	if (filesystem::exists(config))
+		ConfigReader::getSingleton().load(config);
+	else
+		std::cout << "Error cannot load configuration file. " << config << " does not exist" << std::endl;
 
 	// Initialize the scripting engine
 	ScriptEngine& scriptEngine = ScriptEngine::getSingleton();
@@ -62,10 +68,27 @@ int main(int argc, char *argv[])
 
 	scriptEngine.addFunction("registerUICallbacks", registerUICallbacks);
 
+	// set global
 	g_ScriptEngine = &scriptEngine;
 
-	// run the script
-	scriptEngine.run(scriptName);
+	// init GLFW
+	if (!glfwInit())
+	{
+		std::cout << "failed to initialize GLFW" << std::endl;
+		return -1;
+	}
+
+	// check if the script file exists
+	if (filesystem::exists(script))
+	{
+		// run script
+		scriptEngine.run(script);
+	}
+	else
+	{
+		std::cout << "Error cannot load script. " << script << " does not exist" << std::endl;
+		return 1;
+	}
 
 
 	// terminate glfw
