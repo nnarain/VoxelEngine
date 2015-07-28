@@ -204,6 +204,9 @@ void ScriptEngine::addPackagePaths()
 {
 	ConfigReader& config = ConfigReader::getSingleton();
 
+	// check if the option exists
+	if (!config.exists("package_path")) return;
+
 	// get the package path from the configuration file
 	std::string configPackagePath = config.getValue<std::string>("package_path");
 
