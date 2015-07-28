@@ -2,12 +2,15 @@
 #include "VoxelEngine.h"
 #include "ScriptEngine.h"
 #include "Window.h"
+#include "ConfigReader.h"
 
 #include <SGL/SGL.h>
 #include <SGL/Util/Exception.h>
 
 #include <iostream>
 #include <string>
+
+#include <boost/filesystem.hpp>
 
 #define VERSION "1.0"
 
@@ -47,11 +50,15 @@ int main(int argc, char *argv[])
 
 	glfwWindowHint(GLFW_OPENGL_PROFILE, 0);
 
+	// load optional config file
+	if (boost::filesystem::exists("config.json"))
+		ConfigReader::getSingleton().load("config.json");
+
 	//
-	char *scriptName = argv[1];
+	std::string scriptName = std::string(argv[1]);
 
 	// Initialize the scripting engine
-	ScriptEngine scriptEngine;
+	ScriptEngine& scriptEngine = ScriptEngine::getSingleton();
 	scriptEngine.init();
 	scriptEngine.setErrorCallback(scriptError);
 

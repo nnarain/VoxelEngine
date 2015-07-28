@@ -12,6 +12,12 @@ namespace engine
 	{
 	}
 
+	ConfigReader& ConfigReader::getSingleton()
+	{
+		static ConfigReader config;
+		return config;
+	}
+
 	void ConfigReader::load(const std::string& configFileName)
 	{
 		std::ifstream file(configFileName);

@@ -54,8 +54,6 @@ namespace engine
 
 		gui::CommandLine* getCommandLine();
 
-		ConfigReader& getConfig();
-
 		/**
 			Return the instance of the voxel engine
 		*/
@@ -89,9 +87,6 @@ namespace engine
 
 		//
 		std::unique_ptr<TextRenderer> _textRenderer;
-
-		//
-		ConfigReader _config;
 
 		//
 		util::Logger _logger;

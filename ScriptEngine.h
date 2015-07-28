@@ -28,16 +28,26 @@ namespace engine
 			void init();
 
 			/**
-			Run a script
+				Run a script
 			*/
-			void run(char *scriptName);
+			void run(const std::string& scriptName);
 
 			/**
+			
+			*/
+			void doString(const std::string& s);
 
+			/**
+				
+			*/
+
+			/**
+				Set a callback function for errors
 			*/
 			void setErrorCallback(ErrorCallback callback);
 
 			/**
+				Add a function to the engine
 			*/
 			template<typename T>
 			void addFunction(const std::string& name, T func)
@@ -49,13 +59,21 @@ namespace engine
 				];
 			}
 
+			void addPackagePaths();
+
 			/**
+				Call a function in the script
 			*/
 			template<typename... Args>
 			void callFunction(const std::string& name, Args... args)
 			{
 				luabind::call_function<void>(_state, name.c_str(), args...);
 			}
+
+			/**
+				
+			*/
+			static ScriptEngine& getSingleton();
 
 		private:
 

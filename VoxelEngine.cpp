@@ -126,10 +126,6 @@ void VoxelEngine::init(const char * title, int width, int height)
 	// initialize the text renderer
 	_textRenderer = std::make_unique<TextRenderer>();
 	_textRenderer->init();
-
-	// load optional config file
-	if (boost::filesystem::exists("config.json"))
-		_config.load("config.json");
 }
 
 void VoxelEngine::initializeContext()
@@ -243,11 +239,6 @@ util::Logger& VoxelEngine::getLogger()
 gui::CommandLine* VoxelEngine::getCommandLine()
 {
 	return _commandLine.get();
-}
-
-ConfigReader& VoxelEngine::getConfig()
-{
-	return _config;
 }
 
 VoxelEngine* VoxelEngine::getEngine()

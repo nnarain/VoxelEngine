@@ -39,6 +39,8 @@ namespace engine
 			return _root.get<T>(child);
 		}
 
+		static ConfigReader& getSingleton();
+
 	private:
 
 		boost::property_tree::ptree _root;

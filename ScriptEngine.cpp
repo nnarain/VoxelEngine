@@ -8,8 +8,11 @@
 #include "Noise.h"
 #include "FPSCamera.h"
 #include "CommandLine.h"
+#include "ConfigReader.h"
 
 #include <SGL/Math/Vector3.h>
+
+#include <sstream>
 
 using namespace engine;
 using namespace engine::script;
@@ -19,6 +22,12 @@ ScriptEngine::ScriptEngine() : _errorCallback(nullptr)
 	_state = luaL_newstate();
 }
 
+ScriptEngine& ScriptEngine::getSingleton()
+{
+	static ScriptEngine scriptEngine;
+	return scriptEngine;
+}
+
 void ScriptEngine::init()
 {
 	using namespace luabind;
@@ -26,6 +35,9 @@ void ScriptEngine::init()
 	open(_state);
 
 	luaL_openlibs(_state);
+
+	// add package paths from the configuration file
+	addPackagePaths();
 
 	// export classes
 	module(_state)[
@@ -168,10 +180,10 @@ void ScriptEngine::init()
 
 }
 
-void ScriptEngine::run(char *scriptName)
+void ScriptEngine::run(const std::string& scriptName)
 {
 	// run the script file
-	if (luaL_dofile(_state, scriptName) != 0)
+	if (luaL_dofile(_state, scriptName.c_str()) != 0)
 	{
 		// if an error occurs and there is a error callback function
 		if (_errorCallback != NULL)
@@ -181,6 +193,26 @@ void ScriptEngine::run(char *scriptName)
 			_errorCallback(error);
 		}
 	}
+}
+
+void ScriptEngine::doString(const std::string& s)
+{
+	luaL_dostring(_state, s.c_str());
+}
+
+void ScriptEngine::addPackagePaths()
+{
+	ConfigReader& config = ConfigReader::getSingleton();
+
+	// get the package path from the configuration file
+	std::string configPackagePath = config.getValue<std::string>("package_path");
+
+	// generate lua code to set the package path
+	std::stringstream ss;
+	ss << "package.path = " << "'" << configPackagePath << ";'" << ".. package.path";
+
+	// run the line
+	doString(ss.str());
 }
 
 std::string ScriptEngine::getErrorString()
