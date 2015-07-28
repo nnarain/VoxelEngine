@@ -7,6 +7,8 @@ namespace engine
 	{
 		Window::Window(const std::string& title, int w, int h) : _width(w), _height(h), _window(NULL)
 		{
+			glfwWindowHint(GLFW_OPENGL_PROFILE, 0);
+
 			_window = glfwCreateWindow(w, h, title.c_str(), NULL, NULL);
 
 			if (!_window)

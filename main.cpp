@@ -48,8 +48,6 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 
-	glfwWindowHint(GLFW_OPENGL_PROFILE, 0);
-
 	// load optional config file
 	if (boost::filesystem::exists("config.json"))
 		ConfigReader::getSingleton().load("config.json");
